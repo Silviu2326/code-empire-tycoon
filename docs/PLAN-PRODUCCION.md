@@ -325,6 +325,7 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 - [ ] Canal de feedback: formulario, Discord o issues.
 - [ ] Plan de parches: corregir bugs críticos en menos de 48 h.
 - [ ] Ideas para después del lanzamiento: logros, ranking, más géneros, eventos de temporada, más idiomas.
+- [ ] Modo Pro: proyectos reales construidos con IA. Ver el análisis en [MODO-PRO.md](./MODO-PRO.md).
 
 ---
 
