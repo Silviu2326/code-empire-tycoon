@@ -54,7 +54,7 @@ export function advanceMonth(game) {
     wishlist = Math.round(wishlist * 0.6);
     fans += Math.round(launch / 120);
     launchIncome += launch;
-    xpGain += 20 + quality / 5;
+    xpGain += 10 + quality / 5;
     say(
       'Lanzamiento',
       `${project.name} ya está a la venta`,

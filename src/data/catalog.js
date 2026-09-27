@@ -83,7 +83,7 @@ export const sizes = [
 // Efectos: speed multiplica el avance, quality suma calidad inicial,
 // reward multiplica la recompensa y difficulty se suma a la dificultad.
 export const techs = [
-  { id: 'unity', name: 'Unity', cost: 300, speed: 0.1, effect: '+10% velocidad' },
+  { id: 'unity', name: 'Motor de juegos', cost: 300, speed: 0.1, effect: '+10% velocidad' },
   { id: 'csharp', name: 'C#', cost: 0, speed: 0.05, effect: '+5% velocidad' },
   { id: 'ai', name: '+ IA', cost: 400, quality: 5, effect: '+5 calidad' },
   { id: 'multiplayer', name: 'Multijugador', cost: 1200, reward: 0.25, difficulty: 0.2, effect: '+25% ventas, más difícil' },
@@ -99,13 +99,31 @@ export const defaultDraft = {
   techs: ['unity', 'csharp', 'ai']
 };
 
+// Nombres ficticios: no se usan marcas reales. Los `id` se mantienen para no romper partidas guardadas.
+// `icon` es [hoja, índice]: 'aiTools' es una hoja 2x2; 'products' y 'upgrades' son 3x3.
 export const aiTools = [
-  { id: 'chatgpt', name: 'ChatGPT Plus', role: 'Código, ideas y diálogos', setup: 800, price: 20, boost: 5, sprite: 0 },
-  { id: 'claude', name: 'Claude Pro', role: 'Análisis, escritura y lógica', setup: 800, price: 20, boost: 4, sprite: 1 },
-  { id: 'midjourney', name: 'Midjourney', role: 'Arte y conceptos', setup: 1200, price: 30, boost: 5, sprite: 2 },
-  { id: 'runway', name: 'Runway', role: 'Vídeos y animaciones', setup: 600, price: 15, boost: 3, sprite: 3 },
-  { id: 'copilot', name: 'GitHub Copilot', role: 'Autocompletado de código', setup: 400, price: 10, boost: 4, sprite: 0 },
-  { id: 'unity', name: 'Unity Pro', role: 'Motor de juegos avanzado', setup: 8000, price: 200, boost: 10, sprite: 1 }
+  {
+    id: 'chatgpt',
+    name: 'PromptPal Plus',
+    role: 'Código, ideas y diálogos',
+    setup: 800,
+    price: 20,
+    boost: 5,
+    icon: ['products', 2]
+  },
+  { id: 'claude', name: 'Sage Pro', role: 'Análisis, escritura y lógica', setup: 800, price: 20, boost: 4, icon: ['aiTools', 1] },
+  { id: 'midjourney', name: 'DreamCanvas', role: 'Arte y conceptos', setup: 1200, price: 30, boost: 5, icon: ['products', 7] },
+  { id: 'runway', name: 'ClipForge', role: 'Vídeos y animaciones', setup: 600, price: 15, boost: 3, icon: ['aiTools', 3] },
+  { id: 'copilot', name: 'CodeBuddy', role: 'Autocompletado de código', setup: 400, price: 10, boost: 4, icon: ['upgrades', 0] },
+  {
+    id: 'unity',
+    name: 'Nova Engine Pro',
+    role: 'Motor de juegos avanzado',
+    setup: 8000,
+    price: 200,
+    boost: 10,
+    icon: ['upgrades', 7]
+  }
 ];
 
 // `portrait` es el cuadrante de employee-portraits.png (solo hay 4 retratos).
@@ -148,8 +166,8 @@ export const candidates = [
 ];
 
 export const campaigns = [
-  { id: 'youtube', name: 'Tráiler en YouTube', reach: '125K', price: 1200, fans: 420, duration: 3, sprite: 0 },
-  { id: 'reddit', name: 'Publicación en Reddit', reach: '80K', price: 800, fans: 260, duration: 2, sprite: 1 },
+  { id: 'youtube', name: 'Tráiler en vídeo', reach: '125K', price: 1200, fans: 420, duration: 3, sprite: 0 },
+  { id: 'reddit', name: 'Publicación en foros', reach: '80K', price: 800, fans: 260, duration: 2, sprite: 1 },
   { id: 'influencer', name: 'Influencer Gaming', reach: '250K', price: 2500, fans: 780, duration: 3, sprite: 2 },
   { id: 'festival', name: 'Demo en festival indie', reach: '40K', price: 1600, fans: 510, duration: 1, sprite: 3 }
 ];

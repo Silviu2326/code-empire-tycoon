@@ -11,6 +11,6 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(version)
   },
   test: {
-    include: ['src/**/*.test.{js,jsx}']
+    include: ['src/**/*.test.{js,jsx}', 'test/**/*.test.js']
   }
 });

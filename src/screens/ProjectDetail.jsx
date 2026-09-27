@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../components/GameContext.js';
 import { PixelLandscape } from '../components/Scenes.jsx';
-import { Avatar, Bar, ScreenTitle, Sprite, Stars, Tabs } from '../components/ui.jsx';
-import { assets } from '../data/assets.js';
+import { Avatar, Bar, ScreenTitle, Stars, Tabs, ToolIcon } from '../components/ui.jsx';
 import { currency, formatDate } from '../game/format.js';
 import {
   CANCEL_REFUND,
@@ -11,8 +10,10 @@ import {
   estimateMonthsLeft,
   estimatedCompletion,
   launchRevenue,
+  marketSaturation,
   monthlyGain,
   projectOfStaff,
+  recentLaunches,
   staffMembers,
   toolsFor
 } from '../game/rules.js';
@@ -114,7 +115,7 @@ function Summary({ project, isDev, openTeam }) {
         {tools.length === 0 && <p className="muted">Ninguna herramienta asignada.</p>}
         {tools.map((tool) => (
           <div className="tool-mini" key={tool.id}>
-            <Sprite image={assets.aiTools} index={tool.sprite} className="tool-glyph" />
+            <ToolIcon tool={tool} />
             <div>
               <strong>{tool.name}</strong>
               <span>{tool.role}</span>
@@ -206,7 +207,7 @@ function TeamTab({ project, isDev }) {
           const assigned = project.ai.includes(tool.id);
           return (
             <div className="assign-row" key={tool.id}>
-              <Sprite image={assets.aiTools} index={tool.sprite} className="tool-glyph" />
+              <ToolIcon tool={tool} />
               <div>
                 <strong>{tool.name}</strong>
                 <small>+{tool.boost} de impulso</small>
@@ -236,7 +237,11 @@ function Analysis({ project, isDev }) {
       ['Avance al mes', `${gain.progress.toFixed(1)}%`],
       ['Mejora de calidad al mes', `+${gain.quality.toFixed(1)}`],
       ['Meses restantes', estimateMonthsLeft(project, game)],
-      ['Ingresos estimados del lanzamiento', currency(launchRevenue(project, game))]
+      ['Ingresos estimados del lanzamiento', currency(launchRevenue(project, game))],
+      [
+        'Saturación del mercado',
+        `${recentLaunches(game)} lanzamientos en 12 meses (${Math.round((1 - marketSaturation(game)) * 100)}% menos ventas)`
+      ]
     );
   }
   if (project.status === 'completed') {

@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { reportError } from '../telemetry.js';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
+    reportError(error, { source: 'react', componentStack: String(info?.componentStack || '').slice(0, 2000) });
     console.error('Error en Code Empire Tycoon', error, info);
   }
 

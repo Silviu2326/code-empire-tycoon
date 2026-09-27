@@ -4,7 +4,7 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 > Las referencias `App.jsx:NNN` apuntan a `src/App.jsx` en el commit `abeeaed`.
 
-> **Estado (v0.4.0):** las fases 0 a 6 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
+> **Estado (v0.5.0):** las fases 0 a 9 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
 
 ---
 
@@ -275,12 +275,12 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
 ## Fase 7 — Legal y marcas
 
-- [ ] **Nombres de productos reales:** ChatGPT, Claude, Midjourney, Runway, GitHub Copilot y Unity son marcas registradas, y se usan con sus precios. Sustituirlos por parodias o nombres ficticios, o conseguir permiso.
+- [x] **Nombres de productos reales:** ChatGPT, Claude, Midjourney, Runway, GitHub Copilot y Unity son marcas registradas, y se usan con sus precios. Sustituirlos por parodias o nombres ficticios, o conseguir permiso. _(v0.5: nombres ficticios e iconos genéricos; tabla en `docs/LEGAL.md`)._
 - [x] **Personajes con nombres protegidos:** "Diana Prince" es Wonder Woman (DC Comics). Cambiarlo. _(v0.2: renombrada a Diana Prieto)._
-- [ ] Revisar el origen y la licencia de todas las imágenes de `public/assets`. Si son generadas por IA, revisar los términos de la herramienta usada.
-- [ ] Añadir un archivo `LICENSE` y una pantalla de créditos.
-- [ ] Política de privacidad y aviso de cookies si se añaden analíticas (RGPD).
-- [ ] Si se publica en tiendas de apps: clasificación por edades y cumplir sus políticas.
+- [ ] Revisar el origen y la licencia de todas las imágenes de `public/assets`. Si son generadas por IA, revisar los términos de la herramienta usada. _(Pendiente del titular: indicar el origen y la licencia en `docs/LEGAL.md`, apartado 2)._
+- [x] Añadir un archivo `LICENSE` y una pantalla de créditos. _(v0.5: `LICENSE` con todos los derechos reservados; créditos en Opciones)._
+- [x] Política de privacidad y aviso de cookies si se añaden analíticas (RGPD). _(v0.5: `public/privacidad.html`; sin cookies no hace falta aviso. Falta un correo de contacto real)._
+- [x] Si se publica en tiendas de apps: clasificación por edades y cumplir sus políticas. _(v0.5: no aplica por ahora; recomendación PEGI 3 y requisitos en `docs/LEGAL.md`)._
 
 ---
 
@@ -288,47 +288,47 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
 ### Tests unitarios (Vitest)
 
-- [ ] `advanceMonth`: progreso, calidad, pagos, subida de nivel y cambio de año de diciembre a enero.
-- [ ] Todas las acciones: contratar, comprar IA, crear proyecto, campañas, mejorar oficina.
-- [ ] Casos límite: dinero insuficiente, sin servidores, plazas llenas, guardado corrupto.
+- [x] `advanceMonth`: progreso, calidad, pagos, subida de nivel y cambio de año de diciembre a enero.
+- [x] Todas las acciones: contratar, comprar IA, crear proyecto, campañas, mejorar oficina.
+- [x] Casos límite: dinero insuficiente, sin servidores, plazas llenas, guardado corrupto.
 
 ### Tests de extremo a extremo (Playwright)
 
-- [ ] Nueva partida → crear proyecto → completarlo → cobrar.
-- [ ] Guardar → recargar la página → cargar partida.
-- [ ] Pulsar cada botón del inventario de la fase 2 y comprobar su efecto.
+- [x] Nueva partida → crear proyecto → completarlo → cobrar.
+- [x] Guardar → recargar la página → cargar partida.
+- [x] Pulsar cada botón del inventario de la fase 2 y comprobar su efecto. _(v0.5: recorrido por todas las pantallas y diálogos comprobando nombres accesibles y errores, más pruebas específicas de cada acción)._
 
 ### Balance
 
-- [ ] Simular partidas completas con un script y graficar dinero y nivel en el tiempo. _(Primera simulación v0.3 con un bot sensato: gana en ~58 meses de juego y acaba con más de $1M; el final es demasiado fácil y casi nunca se llega a calidad 90 para el evento de premios)._
-- [ ] Definir la duración objetivo de una partida.
-- [ ] Ajustar costes y recompensas para que no haya estrategias rotas (por ejemplo, spamear campañas).
+- [x] Simular partidas completas con un script y graficar dinero y nivel en el tiempo. _(Primera simulación v0.3 con un bot sensato: gana en ~58 meses de juego y acaba con más de $1M; el final es demasiado fácil y casi nunca se llega a calidad 90 para el evento de premios)._ _(v0.5: `npm run simulate` (añade `-- --csv` para gráficas) con 5 estilos de juego)._
+- [x] Definir la duración objetivo de una partida. _(v0.5: un jugador sensato gana en 120–220 meses de juego (unos 10–15 min a 1x); vigilado por `src/game/balance.test.js`)._
+- [x] Ajustar costes y recompensas para que no haya estrategias rotas (por ejemplo, spamear campañas). _(v0.5: saturación del mercado, curva de experiencia más larga y calidad alcanzable; spamear campañas no acelera la partida)._
 
 ### Otras pruebas
 
-- [ ] Navegadores: Chrome, Firefox, Safari (incluido iOS) y Edge.
-- [ ] Prueba con jugadores reales (5–10 personas), recogiendo sus opiniones.
+- [x] Navegadores: Chrome, Firefox, Safari (incluido iOS) y Edge. _(v0.5: la CI ejecuta los e2e en Chrome, Firefox y Safari (iPhone); en local solo se ha podido probar Chromium)._
+- [ ] Prueba con jugadores reales (5–10 personas), recogiendo sus opiniones. _(Pendiente: guía en `docs/PLAYTEST.md`)._
 
 ---
 
 ## Fase 9 — Despliegue e infraestructura
 
-- [ ] **Elegir hosting.** Es una web estática, así que lo recomendable es Netlify, Vercel, Cloudflare Pages o GitHub Pages. Con eso sobra `server.mjs`.
-- [ ] Si se mantiene `server.mjs`, hay que arreglarlo:
+- [x] **Elegir hosting.** Es una web estática, así que lo recomendable es Netlify, Vercel, Cloudflare Pages o GitHub Pages. Con eso sobra `server.mjs`. _(v0.5: recomendado Cloudflare Pages, con `public/_headers`; pasos en `docs/DESPLIEGUE.md`)._
+- [x] Si se mantiene `server.mjs`, hay que arreglarlo: _(v0.5: reescrito y cubierto por `test/server.test.js`; `Dockerfile` incluido, sin probar por falta de Docker)._
   - Escucha solo en `127.0.0.1`: en un contenedor tiene que escuchar en `0.0.0.0`.
   - Devuelve `200` con `index.html` para cualquier archivo que no existe, incluidas imágenes y JS. Debe devolver `404` para archivos con extensión.
   - Pone `Cache-Control: no-store` en todo. Los assets con hash deben llevar `max-age=31536000, immutable`, e `index.html` `no-cache`.
   - Falta compresión (gzip/brotli).
   - Falta el tipo `.webp` / `.avif` en `types`.
   - Faltan cabeceras de seguridad: `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`.
-- [ ] Dominio y HTTPS.
-- [ ] Pipeline de despliegue:
+- [ ] Dominio y HTTPS. _(Pendiente del titular: comprar el dominio y conectarlo en Cloudflare Pages (el HTTPS es automático))._
+- [x] Pipeline de despliegue: _(v0.5: CI con lint, tests, build y e2e en 3 navegadores; las previews por PR y el despliegue de `main` los hace Cloudflare Pages al conectar el repo)._
   - Cada PR genera un despliegue de preview.
   - `main` despliega a producción.
-- [ ] Monitorización de errores (Sentry o similar).
-- [ ] Analíticas anónimas respetuosas con la privacidad: embudo del tutorial, duración de las partidas, dónde abandona la gente.
-- [ ] Opcional: PWA (instalable y jugable sin conexión) con `vite-plugin-pwa`.
-- [ ] Opcional: empaquetar para móvil con Capacitor, o para escritorio con Tauri o Electron, si se quiere publicar en tiendas o en Steam.
+- [x] Monitorización de errores (Sentry o similar). _(v0.5: `src/telemetry.js` envía errores si se configura `VITE_ERROR_ENDPOINT`; se puede cambiar por Sentry)._
+- [x] Analíticas anónimas respetuosas con la privacidad: embudo del tutorial, duración de las partidas, dónde abandona la gente. _(v0.5: eventos del embudo si se configura `VITE_ANALYTICS_ENDPOINT`; sin cookies, respeta «No rastrear» y se puede desactivar en Opciones)._
+- [ ] Opcional: PWA (instalable y jugable sin conexión) con `vite-plugin-pwa`. _(Opcional, no hecho: el manifest ya existe; falta el service worker)._
+- [ ] Opcional: empaquetar para móvil con Capacitor, o para escritorio con Tauri o Electron, si se quiere publicar en tiendas o en Steam. _(Opcional, no hecho)._
 
 ---
 

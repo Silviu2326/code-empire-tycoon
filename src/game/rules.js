@@ -10,7 +10,7 @@ import {
   styles,
   techs
 } from '../data/catalog.js';
-import { addMonths } from './format.js';
+import { addMonths, monthsBetween } from './format.js';
 
 export const MAX_OFFICE_LEVEL = 5;
 export const BANKRUPTCY_MONTHS = 3;
@@ -43,7 +43,7 @@ export const currentStage = (game) => empireStages[stageIndex(game.level)];
 
 export const upgradeCost = (officeLevel) => Math.round(5000 * 1.8 ** (officeLevel - 1));
 
-export const xpToNext = (level) => 100 + (level - 1) * 25;
+export const xpToNext = (level) => 100 + (level - 1) * 60;
 
 /** Plazas de empleado (sin contar al fundador). */
 export const staffCapacity = (game) =>
@@ -107,7 +107,7 @@ export function monthlyGain(project, game) {
   const qualityMultiplier = hasManager(game, 'creative') ? 1.2 : 1;
   return {
     progress: ((4 + teamPower + aiBoost * 0.35 + game.officeLevel) * speed) / project.difficulty,
-    quality: ((teamPower * 0.22 + aiBoost * 0.2) * qualityMultiplier) / project.difficulty
+    quality: ((teamPower * 0.4 + aiBoost * 0.3) * qualityMultiplier) / project.difficulty
   };
 }
 
@@ -121,7 +121,21 @@ export function estimatedCompletion(project, game) {
   return addMonths({ month: game.month, year: game.year }, estimateMonthsLeft(project, game));
 }
 
-const salesMultiplier = (game) => (hasUpgrade(game, 'global') ? 1.25 : 1);
+export const SATURATION_WINDOW = 12;
+export const SATURATION_PER_LAUNCH = 0.12;
+
+/** Lanzamientos de los últimos 12 meses: cuantos más, menos vende cada nuevo producto. */
+export function recentLaunches(game) {
+  const now = { month: game.month, year: game.year };
+  return game.projects.filter(
+    (project) =>
+      project.status === 'completed' && project.completedAt && monthsBetween(project.completedAt, now) < SATURATION_WINDOW
+  ).length;
+}
+
+export const marketSaturation = (game) => 1 / (1 + SATURATION_PER_LAUNCH * recentLaunches(game));
+
+const salesMultiplier = (game) => (hasUpgrade(game, 'global') ? 1.25 : 1) * marketSaturation(game);
 
 export function launchRevenue(project, game) {
   const wishlistUsed = game.wishlist * 0.4;

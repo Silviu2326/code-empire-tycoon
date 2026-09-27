@@ -1,6 +1,6 @@
 {
   "name": "code-empire-tycoon",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,9 +13,11 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=chromium",
     "check": "npm run lint && npm run format:check && npm test && npm run build",
-    "images": "node scripts/optimize-images.mjs"
+    "images": "node scripts/optimize-images.mjs",
+    "simulate": "node scripts/simulate.mjs",
+    "test:e2e:all": "playwright test"
   },
   "dependencies": {
     "react": "^19.2.7",

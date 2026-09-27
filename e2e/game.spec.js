@@ -124,3 +124,79 @@ test('Esc cierra solo el diálogo de arriba', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Borrar partida' })).toHaveCount(0);
   await expect(page.getByRole('dialog', { name: 'Opciones' })).toBeVisible();
 });
+
+test('flujo completo: desarrollar, lanzar y cobrar un producto', async ({ page }) => {
+  await newGame(page);
+  await page.getByRole('navigation').getByRole('button', { name: 'Proyectos' }).click();
+  await page.getByRole('button', { name: /Code Quest/ }).click();
+  await page.getByRole('button', { name: 'Crear proyecto' }).click();
+  await expect(page.getByRole('heading', { name: 'Code Quest' })).toBeVisible();
+
+  // Adelantamos el desarrollo casi al final para no esperar meses reales.
+  await page.getByRole('button', { name: 'Menú' }).click();
+  await page.getByRole('button', { name: 'Guardar y salir al menú' }).click();
+  await page.evaluate(() => {
+    const key = 'code-empire-tycoon-save-v2';
+    const game = JSON.parse(localStorage.getItem(key));
+    game.projects = game.projects.map((project) => (project.status === 'dev' ? { ...project, progress: 99 } : project));
+    game.speed = 4;
+    localStorage.setItem(key, JSON.stringify(game));
+  });
+  await page.reload();
+  await page.getByRole('button', { name: /Cargar partida/ }).click();
+  const moneyBefore = await page.getByTitle('Dinero').textContent();
+  await page.getByRole('button', { name: /Reanudar/ }).click();
+
+  await page.getByRole('navigation').getByRole('button', { name: 'Proyectos' }).click();
+  await expect(page.getByRole('tab', { name: /Completados \(1\)/ })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole('button', { name: /Pausar/ }).click();
+  await expect(page.getByTitle('Dinero')).not.toHaveText(moneyBefore);
+  await page.getByRole('tab', { name: /Completados/ }).click();
+  await expect(page.getByText(/Ingresos totales/)).toBeVisible();
+});
+
+test('todas las pantallas se abren sin errores y sus botones tienen nombre', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await newGame(page);
+
+  const checkButtons = async (where) => {
+    const unnamed = await page.evaluate(() =>
+      [...document.querySelectorAll('button')]
+        .filter((button) => !(button.getAttribute('aria-label') || button.textContent).trim())
+        .map((button) => button.outerHTML.slice(0, 80))
+    );
+    expect(unnamed, `botones sin nombre en ${where}`).toEqual([]);
+  };
+
+  await checkButtons('Oficina');
+  await page.getByRole('button', { name: 'Imperio', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Imperio', exact: true })).toBeVisible();
+  await checkButtons('Imperio');
+
+  for (const tab of ['Proyectos', 'IA', 'Empleados', 'Marketing', 'Oficina']) {
+    await page.getByRole('navigation').getByRole('button', { name: tab }).click();
+    await expect(page.locator('.screen-body h2').first()).toBeVisible();
+    await checkButtons(tab);
+  }
+
+  await page.getByRole('navigation').getByRole('button', { name: 'Proyectos' }).click();
+  await page.getByRole('button', { name: '+ Nuevo proyecto' }).click();
+  await checkButtons('Crear proyecto');
+  await page.getByRole('button', { name: 'Crear proyecto' }).click();
+  for (const tab of ['Equipo', 'Análisis', 'Resumen']) {
+    await page.getByRole('tab', { name: tab }).click();
+    await checkButtons(`Proyecto · ${tab}`);
+  }
+
+  for (const [open, dialog] of [
+    [/Balance mensual/, 'Balance mensual'],
+    ['Menú', 'Menú']
+  ]) {
+    await page.getByRole('button', { name: open }).click();
+    await expect(page.getByRole('dialog', { name: dialog })).toBeVisible();
+    await checkButtons(dialog);
+    await page.keyboard.press('Escape');
+  }
+  expect(errors).toEqual([]);
+});

@@ -1,6 +1,5 @@
 import { useGame } from '../components/GameContext.js';
-import { ScreenTitle, Sprite } from '../components/ui.jsx';
-import { assets } from '../data/assets.js';
+import { ScreenTitle, ToolIcon } from '../components/ui.jsx';
 import { aiTools } from '../data/catalog.js';
 import { currency, number } from '../game/format.js';
 
@@ -50,7 +49,7 @@ function ToolRow({ tool }) {
 
   return (
     <article className="tool-row">
-      <Sprite image={assets.aiTools} index={tool.sprite} className="tool-glyph" />
+      <ToolIcon tool={tool} />
       <div>
         <h3>{tool.name}</h3>
         <p>

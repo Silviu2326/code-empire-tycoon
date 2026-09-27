@@ -1516,6 +1516,11 @@ button:disabled {
   height: 100%;
 }
 
+.grid-sprite.tool-glyph {
+  width: 48px;
+  height: 48px;
+}
+
 .executive-portrait {
   display: block;
   width: 52px;
@@ -1675,6 +1680,23 @@ button:disabled {
 
 .victory-title {
   color: var(--gold);
+}
+
+.modal a {
+  color: var(--green);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green);
 }
 
 .option-buttons {

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 import { EconomyDialog, GameOverDialog, IntroDialog, OptionsDialog, PauseMenu, VictoryDialog } from './components/Dialogs.jsx';
 import { GameContext } from './components/GameContext.js';
@@ -9,6 +9,7 @@ import { createInitialGame } from './game/initialState.js';
 import { gameReducer } from './game/reducer.js';
 import { clearSave, loadSave, writeSave } from './game/save.js';
 import { Office } from './screens/Office.jsx';
+import { gameEvents, track } from './telemetry.js';
 import { StartScreen } from './screens/StartScreen.jsx';
 
 // La oficina se carga al momento; el resto de pantallas, bajo demanda.
@@ -103,9 +104,17 @@ function App() {
 
   const ask = useCallback((request) => setConfirm(request), []);
 
+  // Estadísticas anónimas (solo si están configuradas y el jugador no las ha desactivado).
+  const previousGame = useRef(null);
+  useEffect(() => {
+    if (playing) gameEvents(previousGame.current, game).forEach(([event, props]) => track(event, props));
+    previousGame.current = playing ? game : null;
+  }, [game, playing]);
+
   const context = useMemo(() => ({ game, dispatch, ui, navigate, ask }), [game, ui, navigate, ask]);
 
   function startNewGame() {
+    track('game_start');
     dispatch({ type: 'NEW_GAME' });
     setUi({ tab: 'office' });
     setModal(null);
@@ -124,6 +133,7 @@ function App() {
   }
 
   function loadGame() {
+    track('game_load', { level: save.game?.level });
     if (!save.game) return;
     dispatch({ type: 'LOAD', game: save.game });
     setUi({ tab: 'office' });

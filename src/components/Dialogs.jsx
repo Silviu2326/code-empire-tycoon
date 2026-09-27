@@ -3,6 +3,7 @@ import { currency, formatDate, number } from '../game/format.js';
 import { VICTORY_LEVEL } from '../data/catalog.js';
 import { BANKRUPTCY_MONTHS, computeEconomy } from '../game/rules.js';
 import { downloadSave, importSave } from '../game/save.js';
+import { setTelemetryEnabled, telemetryConfigured, telemetryEnabled } from '../telemetry.js';
 import { Modal } from './ui.jsx';
 
 export function EconomyDialog({ game, onClose }) {
@@ -124,11 +125,43 @@ export function OptionsDialog({ exportable, onClearSave, onImport, onClose }) {
         <h3>Controles</h3>
         <p className="hint">Espacio: pausar o reanudar. Tab: moverse entre botones. Esc: cerrar ventanas.</p>
       </section>
+      {telemetryConfigured && <TelemetryOption />}
       <section className="options-section">
-        <h3>Créditos</h3>
-        <p className="hint">Code Empire Tycoon v{__APP_VERSION__}. Hecho con React y Vite.</p>
+        <h3>Créditos y avisos legales</h3>
+        <p className="hint">Code Empire Tycoon v{__APP_VERSION__}. © 2025-2026, todos los derechos reservados.</p>
+        <p className="hint">
+          Todas las empresas, productos, herramientas y personas que aparecen en el juego son ficticios. Cualquier parecido con la
+          realidad es coincidencia.
+        </p>
+        <p className="hint">Hecho con React y React DOM (licencia MIT) y Vite (licencia MIT).</p>
+        <p className="hint">
+          <a href="./privacidad.html" target="_blank" rel="noopener">
+            Política de privacidad
+          </a>
+        </p>
       </section>
     </Modal>
+  );
+}
+
+function TelemetryOption() {
+  const [enabled, setEnabled] = useState(telemetryEnabled);
+  return (
+    <section className="options-section">
+      <h3>Privacidad</h3>
+      <label className="toggle">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(event) => {
+            setTelemetryEnabled(event.target.checked);
+            setEnabled(telemetryEnabled());
+          }}
+        />
+        Enviar estadísticas anónimas y errores
+      </label>
+      <p className="hint">Nos ayuda a mejorar el juego. No incluye datos personales ni cookies.</p>
+    </section>
   );
 }
 

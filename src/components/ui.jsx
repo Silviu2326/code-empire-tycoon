@@ -87,6 +87,12 @@ export function ExecutivePortrait({ index, label }) {
   );
 }
 
+export function ToolIcon({ tool }) {
+  const [sheet, index] = tool.icon;
+  if (sheet === 'aiTools') return <Sprite image={assets.aiTools} index={index} className="tool-glyph" />;
+  return <GridSprite image={assets.empire[sheet]} index={index} className="tool-glyph" />;
+}
+
 export function ProjectIcon({ project, locked = false }) {
   const image = typeof project.icon === 'string' ? assets.projects[project.icon] : null;
   return (
