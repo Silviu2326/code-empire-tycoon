@@ -1,7 +1,16 @@
 import { useGame } from '../components/GameContext.js';
 import { Avatar, ScreenTitle } from '../components/ui.jsx';
 import { currency } from '../game/format.js';
-import { CANDIDATE_ROTATION_MONTHS, availableCandidates, projectOfStaff, staffCapacity, staffMembers } from '../game/rules.js';
+import {
+  CANDIDATE_ROTATION_MONTHS,
+  SCOUT_GEMS,
+  availableCandidates,
+  currentStage,
+  hiredStaff,
+  projectOfStaff,
+  staffCapacity,
+  staffMembers
+} from '../game/rules.js';
 
 function Skills({ person }) {
   return (
@@ -15,8 +24,9 @@ function Skills({ person }) {
 export function Employees() {
   const { game, dispatch, ask, navigate } = useGame();
   const staff = staffMembers(game.staff);
-  const capacity = staffCapacity(game.officeLevel);
-  const full = staff.length >= capacity;
+  const capacity = staffCapacity(game);
+  const hired = hiredStaff(game).length;
+  const full = hired >= capacity;
   const nextRotation = CANDIDATE_ROTATION_MONTHS - (game.elapsed % CANDIDATE_ROTATION_MONTHS);
 
   function fire(person) {
@@ -44,12 +54,11 @@ export function Employees() {
         title="Empleados"
         right={
           <span className="mini-tag">
-            Plazas {staff.length}/{capacity}
+            Plazas {hired}/{capacity}
           </span>
         }
       />
       <h3 className="eyebrow">Tu equipo</h3>
-      {staff.length === 0 && <p className="empty-state">Aún no tienes empleados.</p>}
       {staff.map((person) => {
         const project = projectOfStaff(game, person.id);
         return (
@@ -68,9 +77,11 @@ export function Employees() {
                   Ver proyecto
                 </button>
               ) : null}
-              <button type="button" className="text-danger" onClick={() => fire(person)}>
-                Despedir
-              </button>
+              {!person.founder && (
+                <button type="button" className="text-danger" onClick={() => fire(person)}>
+                  Despedir
+                </button>
+              )}
             </div>
           </article>
         );
@@ -78,8 +89,18 @@ export function Employees() {
       <h3 className="eyebrow">Candidatos</h3>
       <p className="hint">
         {full ? 'No quedan plazas libres: mejora la oficina para contratar a más gente. ' : ''}
-        Nuevos candidatos en {nextRotation} {nextRotation === 1 ? 'mes' : 'meses'}.
+        Nuevos candidatos en {nextRotation} {nextRotation === 1 ? 'mes' : 'meses'}. En la etapa «{currentStage(game).title}»
+        atraes talento de nivel {currentStage(game).tier}.
       </p>
+      <button
+        type="button"
+        className="secondary"
+        disabled={game.gems < SCOUT_GEMS}
+        onClick={() => dispatch({ type: 'SCOUT_CANDIDATES' })}
+      >
+        Buscar más talento ahora (◆ {SCOUT_GEMS})
+      </button>
+      {availableCandidates(game).length === 0 && <p className="empty-state">No hay más candidatos por ahora.</p>}
       {availableCandidates(game).map((person) => (
         <article className="person-card" key={person.id}>
           <Avatar person={person} />

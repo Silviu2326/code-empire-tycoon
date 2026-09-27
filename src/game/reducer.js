@@ -1,10 +1,19 @@
-import { aiTools, campaigns, candidates, findById } from '../data/catalog.js';
+import { aiTools, campaigns, candidates, findById, upgrades } from '../data/catalog.js';
+import { findEvent } from './events.js';
+import { applyGoals } from './goals.js';
 import { currency } from './format.js';
 import { createInitialGame } from './initialState.js';
 import {
   CANCEL_REFUND,
   MAX_OFFICE_LEVEL,
+  SCOUT_GEMS,
+  SPRINT_GEMS,
+  SPRINT_PROGRESS,
   availableCandidates,
+  clamp,
+  findManager,
+  hiredStaff,
+  stageIndex,
   campaignEffectiveness,
   draftProblems,
   projectFromDraft,
@@ -27,7 +36,7 @@ function updateProject(state, projectId, change) {
   return { ...state, projects: state.projects.map((project) => (project.id === projectId ? change(project) : project)) };
 }
 
-export function gameReducer(state, action) {
+function baseReducer(state, action) {
   switch (action.type) {
     case 'NEW_GAME':
       return createInitialGame();
@@ -55,17 +64,16 @@ export function gameReducer(state, action) {
         {
           ...state,
           money: state.money - cost,
-          officeLevel: state.officeLevel + 1,
-          maxServers: state.maxServers + 1
+          officeLevel: state.officeLevel + 1
         },
-        `Oficina mejorada a nivel ${state.officeLevel + 1}: +1 servidor y +2 plazas.`
+        `Oficina mejorada a nivel ${state.officeLevel + 1}: +1 servidor y +1 plaza.`
       );
     }
 
     case 'CREATE_PROJECT': {
       const problems = draftProblems(action.draft, state);
       if (problems.length) return fail(state, problems[0]);
-      const project = projectFromDraft(action.draft);
+      const project = projectFromDraft(action.draft, state);
       const id = `p${state.nextId}`;
       const freeStaff = state.staff.filter((staffId) => !projectOfStaff(state, staffId));
       const projects = state.projects.filter((item) => item.id !== action.ideaId);
@@ -140,7 +148,7 @@ export function gameReducer(state, action) {
       if (!person || state.staff.includes(person.id)) return state;
       if (!availableCandidates(state).some((item) => item.id === person.id))
         return fail(state, 'Ese candidato ya no está disponible.');
-      if (state.staff.length >= staffCapacity(state.officeLevel)) {
+      if (hiredStaff(state).length >= staffCapacity(state)) {
         return fail(state, 'No quedan plazas: mejora la oficina para contratar a más gente.');
       }
       if (state.money < person.salary) return fail(state, `Necesitas al menos un mes de salario (${currency(person.salary)}).`);
@@ -168,7 +176,7 @@ export function gameReducer(state, action) {
     }
 
     case 'FIRE': {
-      if (!state.staff.includes(action.staffId)) return state;
+      if (!state.staff.includes(action.staffId) || findById(candidates, action.staffId)?.founder) return state;
       const person = findById(candidates, action.staffId);
       return notify(
         {
@@ -222,12 +230,87 @@ export function gameReducer(state, action) {
           campaignRuns: { ...state.campaignRuns, [campaign.id]: timesRun + 1 },
           activeCampaigns: [
             ...state.activeCampaigns,
-            { id: campaign.id, monthsLeft: campaign.duration, effectiveness: campaignEffectiveness(timesRun) }
+            { id: campaign.id, monthsLeft: campaign.duration, effectiveness: campaignEffectiveness(timesRun, state) }
           ]
         },
         `${campaign.name} en marcha durante ${campaign.duration} ${campaign.duration === 1 ? 'mes' : 'meses'}.`
       );
     }
+
+    case 'SPRINT': {
+      const project = state.projects.find((item) => item.id === action.projectId);
+      if (!project || project.status !== 'dev') return state;
+      if (state.gems < SPRINT_GEMS) return fail(state, `Necesitas ${SPRINT_GEMS} gemas para un sprint.`);
+      if (project.progress >= 99) return fail(state, 'El proyecto está a punto de terminar; no hace falta un sprint.');
+      return notify(
+        {
+          ...updateProject(state, project.id, (item) => ({ ...item, progress: clamp(item.progress + SPRINT_PROGRESS, 0, 99) })),
+          gems: state.gems - SPRINT_GEMS
+        },
+        `Sprint en ${project.name}: +${SPRINT_PROGRESS}% de progreso.`
+      );
+    }
+
+    case 'SCOUT_CANDIDATES':
+      if (state.gems < SCOUT_GEMS) return fail(state, `Necesitas ${SCOUT_GEMS} gemas para buscar talento.`);
+      return notify(
+        { ...state, gems: state.gems - SCOUT_GEMS, candidateShift: (state.candidateShift || 0) + 3 },
+        'Nuevos candidatos disponibles.'
+      );
+
+    case 'HIRE_MANAGER': {
+      const manager = findManager(action.managerId);
+      if (!manager || state.managers.includes(manager.id)) return state;
+      if (stageIndex(state.level) < manager.minStage) return fail(state, 'Aún no puedes contratar este puesto.');
+      if (state.money < manager.salary) return fail(state, `Necesitas al menos un mes de salario (${currency(manager.salary)}).`);
+      return notify({ ...state, managers: [...state.managers, manager.id] }, `${manager.role} se incorpora al estudio.`);
+    }
+
+    case 'FIRE_MANAGER': {
+      const manager = findManager(action.managerId);
+      if (!manager || !state.managers.includes(manager.id)) return state;
+      return notify(
+        { ...state, managers: state.managers.filter((id) => id !== manager.id) },
+        `${manager.role} deja el estudio.`,
+        'orange'
+      );
+    }
+
+    case 'BUY_UPGRADE': {
+      const upgrade = findById(upgrades, action.upgradeId);
+      if (!upgrade || state.upgrades.includes(upgrade.id)) return state;
+      if (stageIndex(state.level) < upgrade.minStage) return fail(state, 'Esta mejora aún no está disponible.');
+      if (state.money < upgrade.cost) return fail(state, `Necesitas ${currency(upgrade.cost)} para ${upgrade.name}.`);
+      return notify(
+        { ...state, money: state.money - upgrade.cost, upgrades: [...state.upgrades, upgrade.id] },
+        `${upgrade.name}: ${upgrade.effect}.`
+      );
+    }
+
+    case 'RESOLVE_EVENT': {
+      const message = state.messages.find((item) => item.id === action.messageId);
+      const event = message && findEvent(message.eventId);
+      const choice = event?.choices[action.choiceIndex];
+      if (!choice || message.choice !== undefined) return state;
+      if (choice.cost && state.money < choice.cost) return fail(state, `Necesitas ${currency(choice.cost)}.`);
+      const paid = { ...state, money: state.money - (choice.cost || 0) };
+      const applied = choice.apply(paid);
+      return notify(
+        {
+          ...applied,
+          messages: applied.messages.map((item) =>
+            item.id === message.id ? { ...item, read: true, choice: action.choiceIndex } : item
+          )
+        },
+        choice.result
+      );
+    }
+
+    case 'DISMISS_INTRO':
+      return { ...state, introSeen: true };
+
+    case 'DISMISS_VICTORY':
+      return { ...state, victorySeen: true };
 
     case 'READ_MESSAGE':
       return {
@@ -238,4 +321,11 @@ export function gameReducer(state, action) {
     default:
       return state;
   }
+}
+
+const NO_GOALS = new Set(['NEW_GAME', 'LOAD', 'TICK']);
+
+export function gameReducer(state, action) {
+  const next = baseReducer(state, action);
+  return next === state || NO_GOALS.has(action.type) ? next : applyGoals(next);
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../components/GameContext.js';
-import { Bar, ScreenTitle, Tabs } from '../components/ui.jsx';
-import { assets } from '../data/assets.js';
+import { Bar, ProjectIcon, ScreenTitle, Tabs } from '../components/ui.jsx';
 import { currency, formatDate } from '../game/format.js';
 import { estimatedCompletion } from '../game/rules.js';
 
@@ -57,14 +56,7 @@ export function Projects() {
       {visible.length === 0 && <p className="empty-state">{emptyTexts[filter]}</p>}
       {visible.map((project) => (
         <button type="button" className="project-card" key={project.id} onClick={() => open(project)}>
-          <div className={`project-icon ${project.status === 'idea' || project.status === 'cancelled' ? 'locked' : ''}`}>
-            <img src={assets.projects[project.icon] || assets.projects.city} alt="" />
-            {project.status === 'idea' && (
-              <span className="icon-lock" aria-hidden="true">
-                💡
-              </span>
-            )}
-          </div>
+          <ProjectIcon project={project} locked={project.status === 'idea' || project.status === 'cancelled'} />
           <div className="project-info">
             <h3>{project.name}</h3>
             <p>

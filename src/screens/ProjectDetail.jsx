@@ -6,6 +6,8 @@ import { assets } from '../data/assets.js';
 import { currency, formatDate } from '../game/format.js';
 import {
   CANCEL_REFUND,
+  SPRINT_GEMS,
+  SPRINT_PROGRESS,
   estimateMonthsLeft,
   estimatedCompletion,
   launchRevenue,
@@ -124,6 +126,23 @@ function Summary({ project, isDev, openTeam }) {
       {isDev && game.paused && (
         <button type="button" className="primary big" onClick={() => dispatch({ type: 'SET_PAUSED', paused: false })}>
           Reanudar desarrollo
+        </button>
+      )}
+      {isDev && (
+        <button
+          type="button"
+          className="secondary"
+          disabled={game.gems < SPRINT_GEMS || project.progress >= 99}
+          onClick={() =>
+            ask({
+              title: 'Sprint',
+              text: `El equipo hace un esfuerzo extra: +${SPRINT_PROGRESS}% de progreso al momento por ${SPRINT_GEMS} gemas.`,
+              confirmLabel: `Gastar ◆ ${SPRINT_GEMS}`,
+              onConfirm: () => dispatch({ type: 'SPRINT', projectId: project.id })
+            })
+          }
+        >
+          Sprint +{SPRINT_PROGRESS}% (◆ {SPRINT_GEMS})
         </button>
       )}
       {isDev && (

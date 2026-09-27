@@ -1,6 +1,6 @@
 # Code Empire Tycoon
 
-Juego de gestión para el navegador: empiezas programando en tu habitación y construyes un imperio tecnológico. Creas proyectos, contratas un equipo, activas herramientas de IA, lanzas campañas de marketing y vigilas que las cuentas no acaben en números rojos.
+Juego de gestión para el navegador: empiezas programando en tu habitación y construyes un imperio tecnológico. Ganas al llegar al nivel 15 («Imperio tecnológico»); pierdes si pasas 3 meses seguidos en números rojos. Creas proyectos, contratas un equipo, activas herramientas de IA, lanzas campañas de marketing y vigilas que las cuentas no acaben en números rojos.
 
 ## Requisitos
 
@@ -31,7 +31,9 @@ src/
     rules.js         fórmulas de economía, progreso, capacidad…
     tick.js          avance de un mes (advanceMonth)
     reducer.js       todas las acciones del jugador
-    save.js          guardado en localStorage con validación
+    events.js        eventos de imperio con decisiones
+    goals.js         objetivos-tutorial
+    save.js          guardado en localStorage con validación y migraciones
     initialState.js  partida inicial
   components/  piezas reutilizables (barra superior, diálogos, UI)
   screens/     una pantalla por archivo

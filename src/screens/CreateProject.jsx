@@ -3,12 +3,12 @@ import { useGame } from '../components/GameContext.js';
 import { ChoiceGrid, ScreenTitle } from '../components/ui.jsx';
 import { defaultDraft, genres, sizes, styles, techs } from '../data/catalog.js';
 import { currency } from '../game/format.js';
-import { draftProblems, projectFromDraft } from '../game/rules.js';
+import { draftProblems, projectFromDraft, sizeUnlocked } from '../game/rules.js';
 
 export function CreateProject() {
   const { game, dispatch, ui, navigate } = useGame();
   const [draft, setDraft] = useState(() => ({ ...defaultDraft, ...ui.draft }));
-  const project = projectFromDraft(draft);
+  const project = projectFromDraft(draft, game);
   const problems = draftProblems(draft, game);
   const set = (key) => (value) => setDraft((current) => ({ ...current, [key]: value }));
 
@@ -45,7 +45,11 @@ export function CreateProject() {
         title="Tamaño del proyecto"
         value={draft.size}
         onChange={set('size')}
-        options={sizes.map((size) => ({ ...size, label: `${size.id} · ${currency(size.cost)}` }))}
+        options={sizes.map((size) => ({
+          ...size,
+          icon: sizeUnlocked(size.id, game) ? size.icon : '🔒',
+          label: `${size.id} · ${currency(size.cost)}`
+        }))}
       />
       <section className="panel">
         <h2>Tecnologías</h2>

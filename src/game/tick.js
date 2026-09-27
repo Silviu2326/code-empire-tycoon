@@ -1,4 +1,6 @@
-import { campaigns, findById } from '../data/catalog.js';
+import { VICTORY_LEVEL, campaigns, empireStages, findById } from '../data/catalog.js';
+import { nextEvent } from './events.js';
+import { applyGoals } from './goals.js';
 import { addMonths, currency } from './format.js';
 import {
   BANKRUPTCY_MONTHS,
@@ -10,6 +12,7 @@ import {
   initialMonthlySales,
   launchRevenue,
   monthlyGain,
+  stageIndex,
   xpToNext
 } from './rules.js';
 
@@ -95,6 +98,19 @@ export function advanceMonth(game) {
     gems += 75;
     say('Estudio', `¡Subes a nivel ${level}!`, 'Tu estudio gana prestigio. Recibes 75 gemas.', 'purple');
   }
+  if (stageIndex(level) > stageIndex(game.level)) {
+    const stage = empireStages[stageIndex(level)];
+    say('Imperio', `Nueva etapa: ${stage.title}`, `${stage.subtitle} Desbloqueas: ${stage.perks.join(', ')}.`, 'green');
+  }
+  const wonNow = !game.won && level >= VICTORY_LEVEL;
+  if (wonNow) {
+    say(
+      'Imperio',
+      '¡Has construido tu imperio tecnológico!',
+      'Has llegado a la última etapa. Puedes seguir jugando tanto como quieras.',
+      'green'
+    );
+  }
 
   // 4. Dinero y bancarrota.
   const money = game.money + economy.net + launchIncome;
@@ -123,8 +139,9 @@ export function advanceMonth(game) {
     -HISTORY_LENGTH
   );
 
-  return {
+  const advanced = {
     ...game,
+    won: game.won || wonNow,
     month: now.month,
     year: now.year,
     elapsed,
@@ -143,4 +160,30 @@ export function advanceMonth(game) {
     history,
     messages: [...newMessages.reverse(), ...game.messages].slice(0, 30)
   };
+
+  // 5. Como mucho un evento de imperio por mes, en forma de mensaje con decisiones.
+  const event = gameOver ? null : nextEvent(advanced);
+  const withEvent = event
+    ? {
+        ...advanced,
+        nextId: advanced.nextId + 1,
+        firedEvents: [...(advanced.firedEvents || []), event.id],
+        messages: [
+          {
+            id: `m${advanced.nextId}`,
+            from: event.from,
+            subject: event.subject,
+            body: event.body,
+            tone: 'purple',
+            month: now.month,
+            year: now.year,
+            read: false,
+            eventId: event.id
+          },
+          ...advanced.messages
+        ].slice(0, 30)
+      }
+    : advanced;
+
+  return applyGoals(withEvent);
 }

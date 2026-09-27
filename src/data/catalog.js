@@ -1,28 +1,68 @@
 export const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
+// Cada etapa se desbloquea por nivel. Los bonus son acumulados (no se suman entre etapas).
 export const empireStages = [
-  { title: 'Coder de habitación', subtitle: 'Una idea, un portátil y cero excusas.', level: 1 },
-  { title: 'Garaje startup', subtitle: 'Primer equipo, primeras noches largas.', level: 3 },
-  { title: 'Estudio en crecimiento', subtitle: 'Procesos, managers y productos nuevos.', level: 6 },
-  { title: 'HQ corporativo', subtitle: 'Inversores, contratos y reputación global.', level: 10 },
-  { title: 'Imperio tecnológico', subtitle: 'Torre propia, data centers y dominio mundial.', level: 15 }
+  {
+    title: 'Coder de habitación',
+    subtitle: 'Una idea, un portátil y cero excusas.',
+    level: 1,
+    staffBonus: 0,
+    serverBonus: 0,
+    maxSize: 'Mediano',
+    tier: 1,
+    perks: ['Proyectos pequeños y medianos', 'Candidatos junior']
+  },
+  {
+    title: 'Garaje startup',
+    subtitle: 'Primer equipo, primeras noches largas.',
+    level: 3,
+    staffBonus: 1,
+    serverBonus: 0,
+    maxSize: 'Grande',
+    tier: 2,
+    perks: ['+1 plaza', 'Proyectos grandes', 'Candidatos con experiencia']
+  },
+  {
+    title: 'Estudio en crecimiento',
+    subtitle: 'Procesos, managers y productos nuevos.',
+    level: 6,
+    staffBonus: 2,
+    serverBonus: 1,
+    maxSize: 'Grande',
+    tier: 2,
+    perks: ['+1 plaza', '+1 servidor', 'Managers y laboratorio de IA']
+  },
+  {
+    title: 'HQ corporativo',
+    subtitle: 'Inversores, contratos y reputación global.',
+    level: 10,
+    staffBonus: 4,
+    serverBonus: 2,
+    maxSize: 'AAA',
+    tier: 3,
+    perks: ['+2 plazas', '+1 servidor', 'Proyectos AAA', 'Mercado global', 'Talento estrella']
+  },
+  {
+    title: 'Imperio tecnológico',
+    subtitle: 'Torre propia, data centers y dominio mundial.',
+    level: 15,
+    staffBonus: 6,
+    serverBonus: 3,
+    maxSize: 'AAA',
+    tier: 3,
+    perks: ['+2 plazas', '+1 servidor', '¡Victoria!']
+  }
 ];
 
-export const specialEvents = [
-  { title: 'Ronda de inversión', subtitle: 'Convierte ambición en capital.', reward: '+$250K' },
-  { title: 'Lanzamiento mundial', subtitle: 'Tu producto llena escenarios y streams.', reward: '+Fans' },
-  { title: 'Salida a bolsa', subtitle: 'El estudio se vuelve una potencia pública.', reward: '+Valor' },
-  { title: 'Adquisición rival', subtitle: 'Compra talento, tecnología y mercado.', reward: '+Equipo' },
-  { title: 'Premios globales', subtitle: 'Prestigio que vende por ti.', reward: '+Reputación' }
-];
+export const VICTORY_LEVEL = 15;
 
-// `art` elige el icono de proyecto disponible (solo hay tres ilustraciones por ahora).
+// `art` es una ilustración de assets.projects o un índice de sheet-products.png (3x3).
 export const genres = [
-  { id: 'Aventura', icon: '🧭', art: 'sword' },
+  { id: 'Aventura', icon: '🧭', art: 0 },
   { id: 'RPG', icon: '⚔', art: 'sword' },
   { id: 'Acción', icon: '💥', art: 'city' },
-  { id: 'Simulación', icon: '🏙', art: 'city' },
-  { id: 'Estrategia', icon: '🏆', art: 'terminal' },
+  { id: 'Simulación', icon: '🏙', art: 7 },
+  { id: 'Estrategia', icon: '🏆', art: 5 },
   { id: 'Productividad', icon: '🛠', art: 'terminal' }
 ];
 
@@ -69,17 +109,42 @@ export const aiTools = [
 ];
 
 // `portrait` es el cuadrante de employee-portraits.png (solo hay 4 retratos).
+// `tier`: etapa mínima de talento para que aparezca como candidato (ver empireStages).
+export const FOUNDER_ID = 'founder';
+
 export const candidates = [
-  { id: 'alice', name: 'Alice Johnson', job: 'Programadora', salary: 3200, code: 92, art: 45, ai: 64, portrait: 0 },
-  { id: 'bob', name: 'Bob Smith', job: 'Artista 2D', salary: 2800, code: 38, art: 88, ai: 61, portrait: 1 },
-  { id: 'charlie', name: 'Charlie Lee', job: 'Diseñador', salary: 2500, code: 52, art: 75, ai: 70, portrait: 2 },
-  { id: 'diana', name: 'Diana Prieto', job: 'Especialista IA', salary: 3500, code: 68, art: 66, ai: 90, portrait: 3 },
-  { id: 'marco', name: 'Marco Vega', job: 'Backend', salary: 3000, code: 86, art: 34, ai: 72, portrait: 0 },
-  { id: 'lucia', name: 'Lucía Ortega', job: 'Diseñadora de niveles', salary: 2700, code: 48, art: 80, ai: 58, portrait: 1 },
-  { id: 'kenji', name: 'Kenji Mori', job: 'Programador gameplay', salary: 3400, code: 90, art: 50, ai: 60, portrait: 2 },
-  { id: 'sara', name: 'Sara Núñez', job: 'Ingeniera de datos', salary: 3300, code: 78, art: 30, ai: 88, portrait: 3 },
-  { id: 'tomas', name: 'Tomás Rey', job: 'Artista 3D', salary: 3100, code: 35, art: 92, ai: 55, portrait: 0 },
-  { id: 'nora', name: 'Nora Blanco', job: 'QA y producción', salary: 2400, code: 60, art: 55, ai: 62, portrait: 1 }
+  {
+    id: FOUNDER_ID,
+    name: 'Tú',
+    job: 'Fundador/a',
+    salary: 0,
+    code: 80,
+    art: 50,
+    ai: 55,
+    image: 'founder',
+    tier: 0,
+    founder: true
+  },
+  { id: 'alice', name: 'Alice Johnson', job: 'Programadora', salary: 3200, code: 92, art: 45, ai: 64, portrait: 0, tier: 2 },
+  { id: 'bob', name: 'Bob Smith', job: 'Artista 2D', salary: 2800, code: 38, art: 88, ai: 61, portrait: 1, tier: 1 },
+  { id: 'charlie', name: 'Charlie Lee', job: 'Diseñador', salary: 2500, code: 52, art: 75, ai: 70, portrait: 2, tier: 1 },
+  { id: 'diana', name: 'Diana Prieto', job: 'Especialista IA', salary: 3500, code: 68, art: 66, ai: 90, portrait: 3, tier: 3 },
+  { id: 'marco', name: 'Marco Vega', job: 'Backend', salary: 3000, code: 86, art: 34, ai: 72, portrait: 0, tier: 2 },
+  {
+    id: 'lucia',
+    name: 'Lucía Ortega',
+    job: 'Diseñadora de niveles',
+    salary: 2700,
+    code: 48,
+    art: 80,
+    ai: 58,
+    portrait: 1,
+    tier: 1
+  },
+  { id: 'kenji', name: 'Kenji Mori', job: 'Programador gameplay', salary: 3400, code: 90, art: 50, ai: 60, portrait: 2, tier: 3 },
+  { id: 'sara', name: 'Sara Núñez', job: 'Ingeniera de datos', salary: 3300, code: 78, art: 30, ai: 88, portrait: 3, tier: 2 },
+  { id: 'tomas', name: 'Tomás Rey', job: 'Artista 3D', salary: 3100, code: 35, art: 92, ai: 55, portrait: 0, tier: 2 },
+  { id: 'nora', name: 'Nora Blanco', job: 'QA y producción', salary: 2400, code: 60, art: 55, ai: 62, portrait: 1, tier: 1 }
 ];
 
 export const campaigns = [
@@ -87,6 +152,74 @@ export const campaigns = [
   { id: 'reddit', name: 'Publicación en Reddit', reach: '80K', price: 800, fans: 260, duration: 2, sprite: 1 },
   { id: 'influencer', name: 'Influencer Gaming', reach: '250K', price: 2500, fans: 780, duration: 3, sprite: 2 },
   { id: 'festival', name: 'Demo en festival indie', reach: '40K', price: 1600, fans: 510, duration: 1, sprite: 3 }
+];
+
+// Managers: se contratan desde la etapa `minStage`. `sprite` es el índice en sheet-executives.png (3x2).
+export const managers = [
+  {
+    id: 'cto',
+    role: 'Dirección técnica (CTO)',
+    salary: 6000,
+    minStage: 2,
+    sprite: 0,
+    effect: '+15% velocidad en todos los proyectos'
+  },
+  {
+    id: 'creative',
+    role: 'Dirección creativa',
+    salary: 5500,
+    minStage: 2,
+    sprite: 1,
+    effect: '+8 calidad inicial y +20% mejora de calidad'
+  },
+  {
+    id: 'cmo',
+    role: 'Dirección de marketing (CMO)',
+    salary: 5500,
+    minStage: 2,
+    sprite: 3,
+    effect: '+30% seguidores de campañas y +10% ventas de lanzamiento'
+  },
+  { id: 'coo', role: 'Dirección de operaciones (COO)', salary: 5000, minStage: 2, sprite: 4, effect: '+1 servidor y +2 plazas' },
+  {
+    id: 'cfo',
+    role: 'Dirección financiera (CFO)',
+    salary: 6500,
+    minStage: 3,
+    sprite: 2,
+    effect: '-20% en salarios y suscripciones de IA'
+  },
+  { id: 'bizdev', role: 'Desarrollo de negocio', salary: 6000, minStage: 3, sprite: 5, effect: '+40% ingresos por contratos' }
+];
+
+// Mejoras permanentes del estudio. `sprite` es el índice en sheet-upgrades.png (3x3).
+export const upgrades = [
+  {
+    id: 'workstations',
+    name: 'Estaciones de trabajo',
+    cost: 8000,
+    minStage: 1,
+    sprite: 1,
+    effect: '+10% velocidad de desarrollo'
+  },
+  { id: 'press', name: 'Agencia de prensa', cost: 12000, minStage: 1, sprite: 5, effect: '+20% seguidores de campañas' },
+  {
+    id: 'ailab',
+    name: 'Laboratorio de IA',
+    cost: 20000,
+    minStage: 2,
+    sprite: 4,
+    effect: '+25% impulso de las herramientas de IA'
+  },
+  { id: 'datacenter', name: 'Data center propio', cost: 30000, minStage: 2, sprite: 2, effect: '+2 servidores' },
+  {
+    id: 'global',
+    name: 'Mercado global',
+    cost: 60000,
+    minStage: 3,
+    sprite: 6,
+    effect: '+25% ingresos de lanzamiento y ventas mensuales'
+  }
 ];
 
 export const findById = (list, id) => list.find((item) => item.id === id);

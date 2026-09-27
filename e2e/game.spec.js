@@ -8,6 +8,10 @@ test.beforeEach(async ({ page }) => {
 
 async function newGame(page) {
   await page.getByRole('button', { name: 'Nueva partida' }).click();
+  await page
+    .getByRole('dialog', { name: /Bienvenida/ })
+    .getByRole('button', { name: '¡A programar!' })
+    .click();
   await expect(page.getByRole('navigation', { name: 'Secciones' })).toBeVisible();
   // Pausamos para que el tiempo no avance durante la prueba.
   await page.getByRole('button', { name: /Pausar/ }).click();
@@ -45,10 +49,10 @@ test('las pestañas de proyectos filtran de verdad', async ({ page }) => {
 test('contratar pide confirmación y respeta las plazas', async ({ page }) => {
   await newGame(page);
   await page.getByRole('navigation').getByRole('button', { name: 'Empleados' }).click();
-  await expect(page.getByText('Plazas 2/4')).toBeVisible();
+  await expect(page.getByText('Plazas 0/2')).toBeVisible();
   await page.getByRole('button', { name: /\/mes/ }).first().click();
   await page.getByRole('dialog').getByRole('button', { name: 'Contratar' }).click();
-  await expect(page.getByText('Plazas 3/4')).toBeVisible();
+  await expect(page.getByText('Plazas 1/2')).toBeVisible();
 });
 
 test('la partida se guarda y se puede cargar tras recargar', async ({ page }) => {
@@ -66,4 +70,24 @@ test('el balance mensual muestra el desglose', async ({ page }) => {
   await newGame(page);
   await page.getByRole('button', { name: /Balance mensual/ }).click();
   await expect(page.getByRole('dialog', { name: 'Balance mensual' })).toContainText('Salarios');
+});
+
+test('desarrollar la idea inicial cumple el primer objetivo', async ({ page }) => {
+  await newGame(page);
+  await expect(page.getByText('Objetivos')).toBeVisible();
+  await page.getByRole('navigation').getByRole('button', { name: 'Proyectos' }).click();
+  await page.getByRole('button', { name: /Code Quest/ }).click();
+  await expect(page.getByRole('heading', { name: 'Desarrollar idea' })).toBeVisible();
+  await page.getByRole('button', { name: 'Crear proyecto' }).click();
+  await expect(page.getByRole('heading', { name: 'Code Quest' })).toBeVisible();
+  await page.getByRole('navigation').getByRole('button', { name: 'Oficina' }).click();
+  await expect(page.getByText('1/7')).toBeVisible();
+});
+
+test('la pantalla de imperio muestra etapas, managers bloqueados y eventos', async ({ page }) => {
+  await newGame(page);
+  await page.getByRole('button', { name: 'Imperio', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Ruta del imperio' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Bloqueado' }).first()).toBeDisabled();
+  await expect(page.getByText('Requisito: Nivel 4 y un producto lanzado')).toBeVisible();
 });

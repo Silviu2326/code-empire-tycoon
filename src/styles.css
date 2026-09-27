@@ -1494,6 +1494,185 @@ button:disabled {
   }
 }
 
+/* --- Fase 3: imperio, objetivos, eventos --- */
+
+.grid-sprite {
+  display: block;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background-repeat: no-repeat;
+  background-size: 332%;
+  background-color: #0d1822;
+}
+
+.grid-sprite.fill {
+  width: 100%;
+  height: 100%;
+}
+
+.executive-portrait {
+  display: block;
+  width: 52px;
+  height: 66px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background-repeat: no-repeat;
+  background-size: 326% auto;
+  background-color: #0d1822;
+}
+
+.goal-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goal-list li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.goal-list .check {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+}
+
+.goal-list .done .check {
+  background: var(--green-2);
+}
+
+.goal-list .done strong {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.goal-list small {
+  display: block;
+  color: var(--muted);
+}
+
+.goal-list .reward {
+  color: #d47cff;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.stage-banner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.stage-banner p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.perks span {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.72rem;
+}
+
+.shop-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.shop-row h3 {
+  margin: 0 0 3px;
+  font-size: 0.95rem;
+}
+
+.shop-row p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.event-card.locked img {
+  filter: grayscale(1) brightness(0.5);
+}
+
+.event-card .status {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.choice-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px 42px;
+}
+
+.choice-list button {
+  min-height: 42px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: left;
+  background: rgba(42, 70, 89, 0.95);
+  font-weight: 700;
+}
+
+.choice-list .chosen {
+  box-shadow: inset 0 0 0 2px var(--green);
+  color: var(--green);
+}
+
+.chart-switch {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.chart-switch button {
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+}
+
+.chart-switch [aria-pressed='true'] {
+  background: rgba(53, 214, 109, 0.18);
+  color: var(--green);
+}
+
+.chart i.negative-bar {
+  background: linear-gradient(180deg, #f87171, #b91c1c);
+}
+
+.victory-title {
+  color: var(--gold);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

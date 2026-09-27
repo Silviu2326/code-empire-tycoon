@@ -40,14 +40,68 @@ export function Bar({ value, big = false, label }) {
 }
 
 export function Avatar({ person, label }) {
+  const style = person.image
+    ? { backgroundImage: `url(${assets.founder.early})`, backgroundSize: 'cover', backgroundPosition: 'center top' }
+    : { backgroundImage: `url(${assets.portraits})`, backgroundPosition: spritePositions[person.portrait || 0] };
   return (
     <span
       className="avatar portrait-avatar"
       title={label || person.name}
       role="img"
       aria-label={label || person.name}
-      style={{ backgroundImage: `url(${assets.portraits})`, backgroundPosition: spritePositions[person.portrait || 0] }}
+      style={style}
     />
+  );
+}
+
+// Hojas 3x3 (sheet-upgrades, sheet-products): cada celda ocupa ~30% con márgenes.
+const GRID3 = ['4%', '50%', '96%'];
+// Hoja de managers 3x2 con tarjetas verticales.
+const EXEC_X = ['2%', '50%', '98%'];
+const EXEC_Y = ['13%', '83%'];
+
+export function GridSprite({ image, index, className = '' }) {
+  return (
+    <span
+      className={`grid-sprite ${className}`}
+      aria-hidden="true"
+      style={{
+        backgroundImage: `url(${image})`,
+        backgroundPosition: `${GRID3[index % 3]} ${GRID3[Math.floor(index / 3)]}`
+      }}
+    />
+  );
+}
+
+export function ExecutivePortrait({ index, label }) {
+  return (
+    <span
+      className="executive-portrait"
+      role="img"
+      aria-label={label}
+      style={{
+        backgroundImage: `url(${assets.empire.executives})`,
+        backgroundPosition: `${EXEC_X[index % 3]} ${EXEC_Y[Math.floor(index / 3)]}`
+      }}
+    />
+  );
+}
+
+export function ProjectIcon({ project, locked = false }) {
+  const image = typeof project.icon === 'string' ? assets.projects[project.icon] : null;
+  return (
+    <div className={`project-icon ${locked ? 'locked' : ''}`}>
+      {image ? (
+        <img src={image} alt="" />
+      ) : (
+        <GridSprite image={assets.empire.products} index={project.icon || 0} className="fill" />
+      )}
+      {project.status === 'idea' && (
+        <span className="icon-lock" aria-hidden="true">
+          💡
+        </span>
+      )}
+    </div>
   );
 }
 

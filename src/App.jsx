@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.jsx';
-import { EconomyDialog, GameOverDialog, OptionsDialog, PauseMenu } from './components/Dialogs.jsx';
+import { EconomyDialog, GameOverDialog, IntroDialog, OptionsDialog, PauseMenu, VictoryDialog } from './components/Dialogs.jsx';
 import { GameContext } from './components/GameContext.js';
 import { BottomNav, TopBar } from './components/TopBar.jsx';
 import { ConfirmDialog, Toast } from './components/ui.jsx';
@@ -9,6 +9,7 @@ import { gameReducer } from './game/reducer.js';
 import { clearSave, loadSave, writeSave } from './game/save.js';
 import { AiScreen } from './screens/AiScreen.jsx';
 import { CreateProject } from './screens/CreateProject.jsx';
+import { Empire } from './screens/Empire.jsx';
 import { Employees } from './screens/Employees.jsx';
 import { Marketing } from './screens/Marketing.jsx';
 import { Office } from './screens/Office.jsx';
@@ -20,6 +21,7 @@ const MONTH_MS = 4200;
 const TOAST_MS = 3000;
 const screens = {
   office: Office,
+  empire: Empire,
   projects: Projects,
   create: CreateProject,
   project: ProjectDetail,
@@ -45,7 +47,9 @@ function App() {
   const [confirm, setConfirm] = useState(null);
   const [dismissedToast, setDismissedToast] = useState(0);
 
-  const menuOpen = playing && (modal !== null || confirm !== null);
+  const showIntro = playing && !game.introSeen;
+  const showVictory = playing && game.won && !game.victorySeen;
+  const menuOpen = playing && (modal !== null || confirm !== null || showIntro || showVictory);
   useGameLoop(game, dispatch, playing && !menuOpen);
 
   // Guardado automático, agrupando cambios seguidos.
@@ -170,6 +174,10 @@ function App() {
       )}
       {modal === 'economy' && <EconomyDialog game={game} onClose={() => setModal(null)} />}
       {optionsDialog}
+      {showIntro && !confirm && <IntroDialog onClose={() => dispatch({ type: 'DISMISS_INTRO' })} />}
+      {showVictory && !confirm && (
+        <VictoryDialog game={game} onContinue={() => dispatch({ type: 'DISMISS_VICTORY' })} onMenu={exitToMenu} />
+      )}
       {game.gameOver && !confirm && (
         <GameOverDialog
           game={game}

@@ -59,7 +59,7 @@ const navItems = [
   ['marketing', 'Marketing']
 ];
 
-const tabGroup = { create: 'projects', project: 'projects' };
+const tabGroup = { create: 'projects', project: 'projects', empire: 'office' };
 
 export function BottomNav() {
   const { ui, navigate } = useGame();

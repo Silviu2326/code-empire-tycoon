@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { EmpireAssets, EmpireEvents } from '../components/Empire.jsx';
 import { useGame } from '../components/GameContext.js';
 import { ScreenTitle, Sprite, Stat } from '../components/ui.jsx';
 import { assets } from '../data/assets.js';
 import { campaigns, findById } from '../data/catalog.js';
 import { currency, formatDate, number, relativeTime } from '../game/format.js';
+import { findEvent } from '../game/events.js';
 import { campaignEffectiveness, salesForecast } from '../game/rules.js';
 
 export function Marketing() {
@@ -24,11 +24,9 @@ export function Marketing() {
           <Stat label="Seguidores" value={number(game.fans)} />
           <Stat label="Ventas estimadas" value={currency(salesForecast(game))} />
         </div>
-        <FansChart history={game.history} />
+        <HistoryChart history={game.history} />
       </section>
       <Messages />
-      <EmpireAssets />
-      <EmpireEvents />
     </div>
   );
 }
@@ -61,7 +59,7 @@ function ActiveCampaigns() {
 function CampaignRow({ campaign }) {
   const { game, dispatch, ask } = useGame();
   const running = game.activeCampaigns.some((active) => active.id === campaign.id);
-  const effectiveness = campaignEffectiveness(game.campaignRuns[campaign.id] || 0);
+  const effectiveness = campaignEffectiveness(game.campaignRuns[campaign.id] || 0, game);
   const expectedFans = Math.round(campaign.fans * effectiveness);
 
   function start() {
@@ -90,33 +88,54 @@ function CampaignRow({ campaign }) {
   );
 }
 
-function FansChart({ history }) {
+const metrics = {
+  fans: { label: 'Seguidores', format: number },
+  net: { label: 'Balance mensual', format: currency }
+};
+
+function HistoryChart({ history }) {
+  const [metric, setMetric] = useState('fans');
   if (history.length < 2) {
-    return <p className="hint">La gráfica de seguidores aparecerá cuando pasen unos meses.</p>;
+    return <p className="hint">Las gráficas aparecerán cuando pasen unos meses.</p>;
   }
-  const values = history.map((entry) => entry.fans);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
+  const { label, format } = metrics[metric];
+  const values = history.map((entry) => entry[metric]);
   const first = history[0];
   const last = history[history.length - 1];
+  let height;
+  if (metric === 'fans') {
+    const min = Math.min(...values);
+    const range = Math.max(...values) - min || 1;
+    height = (value) => 15 + ((value - min) / range) * 85;
+  } else {
+    const maxAbs = Math.max(...values.map(Math.abs)) || 1;
+    height = (value) => 8 + (Math.abs(value) / maxAbs) * 92;
+  }
   return (
     <figure className="chart-figure">
+      <div className="chart-switch" role="group" aria-label="Métrica de la gráfica">
+        {Object.entries(metrics).map(([id, item]) => (
+          <button type="button" key={id} aria-pressed={metric === id} onClick={() => setMetric(id)}>
+            {item.label}
+          </button>
+        ))}
+      </div>
       <div
         className="chart"
         role="img"
-        aria-label={`Seguidores de ${formatDate(first)} a ${formatDate(last)}: de ${number(values[0])} a ${number(values[values.length - 1])}`}
+        aria-label={`${label} de ${formatDate(first)} a ${formatDate(last)}: de ${format(values[0])} a ${format(values[values.length - 1])}`}
       >
         {history.map((entry) => (
           <i
             key={`${entry.year}-${entry.month}`}
-            title={`${formatDate(entry)}: ${number(entry.fans)}`}
-            style={{ height: `${15 + ((entry.fans - min) / range) * 85}%` }}
+            className={entry[metric] < 0 ? 'negative-bar' : ''}
+            title={`${formatDate(entry)}: ${format(entry[metric])}`}
+            style={{ height: `${height(entry[metric])}%` }}
           />
         ))}
       </div>
       <figcaption className="hint">
-        Seguidores · {formatDate(first)} – {formatDate(last)}
+        {label} · {formatDate(first)} – {formatDate(last)}
       </figcaption>
     </figure>
   );
@@ -154,11 +173,35 @@ function Messages() {
               <strong>{message.from}</strong>
               <p>{message.subject}</p>
             </div>
-            <small>{relativeTime(message, game)}</small>
+            <small>{message.eventId && message.choice === undefined ? 'Decidir' : relativeTime(message, game)}</small>
           </button>
           {openId === message.id && <p className="message-body">{message.body}</p>}
+          {openId === message.id && message.eventId && <EventChoices message={message} />}
         </div>
       ))}
     </section>
+  );
+}
+
+function EventChoices({ message }) {
+  const { game, dispatch } = useGame();
+  const event = findEvent(message.eventId);
+  if (!event) return null;
+  const decided = message.choice !== undefined;
+  return (
+    <div className="choice-list" role="group" aria-label="Decisión">
+      {event.choices.map((choice, index) => (
+        <button
+          type="button"
+          key={choice.label}
+          className={decided && message.choice === index ? 'chosen' : ''}
+          disabled={decided || (choice.cost && game.money < choice.cost)}
+          onClick={() => dispatch({ type: 'RESOLVE_EVENT', messageId: message.id, choiceIndex: index })}
+        >
+          {choice.label}
+          {decided && message.choice === index ? ' ✓' : ''}
+        </button>
+      ))}
+    </div>
   );
 }

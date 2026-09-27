@@ -1,3 +1,5 @@
+import { FOUNDER_ID } from '../data/catalog.js';
+import { goals } from './goals.js';
 import { SAVE_VERSION } from './initialState.js';
 
 export const STORAGE_KEY = 'code-empire-tycoon-save-v2';
@@ -10,7 +12,6 @@ const REQUIRED_FIELDS = {
   xp: 'number',
   money: 'number',
   officeLevel: 'number',
-  maxServers: 'number',
   fans: 'number',
   wishlist: 'number',
   staff: 'object',
@@ -20,6 +21,38 @@ const REQUIRED_FIELDS = {
   activeCampaigns: 'object',
   history: 'object'
 };
+
+/** Migraciones entre versiones del guardado: cada una pasa de la versión N a la N+1. */
+const migrations = {
+  2: (data) => {
+    // eslint-disable-next-line no-unused-vars
+    const { maxServers, ...rest } = data;
+    return {
+      ...rest,
+      saveVersion: 3,
+      staff: [FOUNDER_ID, ...data.staff.filter((id) => id !== FOUNDER_ID)],
+      managers: [],
+      upgrades: [],
+      firedEvents: [],
+      // Las partidas antiguas ya han pasado el tutorial: no se regalan gemas al cargar.
+      goalsDone: goals.map((goal) => goal.id),
+      won: false,
+      victorySeen: false,
+      introSeen: true,
+      equitySold: 0,
+      bonusSlots: 0,
+      candidateShift: 0
+    };
+  }
+};
+
+export function migrateSave(data) {
+  let current = data;
+  while (current && typeof current === 'object' && current.saveVersion < SAVE_VERSION && migrations[current.saveVersion]) {
+    current = migrations[current.saveVersion](current);
+  }
+  return current;
+}
 
 export function isValidSave(data) {
   if (!data || typeof data !== 'object' || data.saveVersion !== SAVE_VERSION) return false;
@@ -44,7 +77,7 @@ export function loadSave() {
       const legacy = LEGACY_KEYS.some((key) => store.getItem(key));
       return { game: null, status: legacy ? 'outdated' : 'empty' };
     }
-    const data = JSON.parse(raw);
+    const data = migrateSave(JSON.parse(raw));
     return isValidSave(data) ? { game: data, status: 'ok' } : { game: null, status: 'corrupt' };
   } catch {
     return { game: null, status: 'corrupt' };

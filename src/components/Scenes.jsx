@@ -2,10 +2,11 @@ import { assets } from '../data/assets.js';
 import { findById, candidates } from '../data/catalog.js';
 import { Avatar } from './ui.jsx';
 
-export function PixelOffice({ hero = false }) {
+export function PixelOffice({ hero = false, stage }) {
+  const scene = hero ? assets.hero : stage === undefined ? assets.office : assets.stages[stage];
   return (
     <div className={`pixel-office has-asset ${hero ? 'hero' : ''}`}>
-      <img className="scene-asset" src={hero ? assets.hero : assets.office} alt="" />
+      <img className="scene-asset" src={scene} alt="" />
       <div className="window">
         <span />
         <span />

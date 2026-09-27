@@ -4,7 +4,7 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 > Las referencias `App.jsx:NNN` apuntan a `src/App.jsx` en el commit `abeeaed`.
 
-> **Estado (v0.2.0):** las fases 0, 1 y 2 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
+> **Estado (v0.3.0):** las fases 0 a 3 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
 
 ---
 
@@ -67,7 +67,7 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 - [x] La calidad inicial es fija (48) y no depende del género, el estilo ni las tecnologías.
 - [x] Las tecnologías no afectan a nada salvo a la recompensa, y el botón "+" solo añade "Multijugador" (ver fase 2).
 - [x] El proyecto "idea" `p3` (Cyber Streets) no se puede iniciar. Al pulsarlo va a la pantalla de crear, pero con los valores por defecto, no con los suyos.
-- [ ] El icono del proyecto se elige solo por género y cae en `terminal` para Aventura y Estrategia. Hacen falta iconos por género. _(v0.2: el icono se elige por género entre las 3 ilustraciones que hay; faltan ilustraciones nuevas)._
+- [x] El icono del proyecto se elige solo por género y cae en `terminal` para Aventura y Estrategia. Hacen falta iconos por género. _(v0.3: iconos por género con las 3 ilustraciones y `sheet-products.png`)._
 - [x] `ProjectDetail` usa `game.projects[0]` si no encuentra el proyecto, y peta si no hay ninguno.
 
 ### Personal
@@ -96,7 +96,7 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
-> **v0.2.0:** todas las filas de estas tablas están resueltas. Las excepciones son Expansión, Eventos y Managers, que ahora llevan la etiqueta "Próximamente" hasta la fase 3, y las decisiones dentro de los mensajes (también fase 3). Las gemas se muestran, pero todavía no sirven para nada (fase 3).
+> **v0.2.0:** todas las filas de estas tablas están resueltas. En v0.3.0 (fase 3) también funcionan Expansión, Eventos, Managers, las decisiones de los mensajes y las gemas.
 
 **Leyenda:**
 
@@ -207,17 +207,26 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
 ## Fase 3 — Completar las mecánicas
 
-- [ ] **Etapas del imperio.** Ahora solo cambian una etiqueta. Deben desbloquear cosas reales: más plazas, servidores, tamaños de proyecto (AAA solo en HQ) y candidatos mejores. Además, la escena de la oficina debe cambiar según la etapa (los assets `stage-*.png` ya existen).
-- [ ] **Eventos especiales** (ronda de inversión, lanzamiento mundial, salida a bolsa, adquisición, premios): son imágenes con texto. Hay que implementar sus disparadores, sus decisiones y sus recompensas reales.
-- [ ] **Expansión** (mercado global, data center): convertirla en mejoras que se puedan comprar.
-- [ ] **Hojas de upgrades, productos y managers:** ahora son imágenes sueltas. Hay que convertirlas en sistemas o quitarlas.
-- [ ] **Gemas:** definir para qué sirven (acelerar proyectos, contratar talento raro, cosméticos) o eliminarlas.
-- [ ] **Mensajes con decisiones:** ofertas de inversores, clientes y prensa con consecuencias.
-- [ ] **Objetivo y final:** condición de victoria (llegar a "Imperio tecnológico" o a una valoración X) y derrota (bancarrota).
-- [ ] **Tutorial / onboarding** de las primeras partidas: qué hacer, cómo se gana y cómo se pierde.
-- [ ] **Estado inicial coherente:** hoy la partida empieza en nivel 3, con $15.430, 8.920 fans y proyectos ya al 65 %. Hay que decidir si se empieza desde cero ("Coder de habitación") como cuenta la narrativa.
+> **Hecho en v0.3.0:**
+>
+> - Nueva partida desde cero ("Coder de habitación", solo el fundador y la idea Code Quest), con bienvenida y 7 objetivos-tutorial que dan gemas.
+> - Las 5 etapas desbloquean plazas, servidores, tamaños de proyecto (Grande en nivel 3, AAA en nivel 10) y candidatos mejores; la escena de la oficina cambia con la etapa.
+> - 6 managers (retratos de `sheet-executives.png`), 5 mejoras permanentes (iconos de `sheet-upgrades.png`), iconos de producto por género (`sheet-products.png`).
+> - 5 eventos de imperio que llegan como mensajes con decisiones (inversión con cesión de participación, gira, adquisición, premios, salida a bolsa).
+> - Gemas: sprint (+10% de progreso) y búsqueda de talento.
+> - Victoria al llegar al nivel 15; derrota por bancarrota. Gráficas de seguidores y de balance mensual.
+
+- [x] **Etapas del imperio.** Ahora solo cambian una etiqueta. Deben desbloquear cosas reales: más plazas, servidores, tamaños de proyecto (AAA solo en HQ) y candidatos mejores. Además, la escena de la oficina debe cambiar según la etapa (los assets `stage-*.png` ya existen).
+- [x] **Eventos especiales** (ronda de inversión, lanzamiento mundial, salida a bolsa, adquisición, premios): son imágenes con texto. Hay que implementar sus disparadores, sus decisiones y sus recompensas reales.
+- [x] **Expansión** (mercado global, data center): convertirla en mejoras que se puedan comprar.
+- [x] **Hojas de upgrades, productos y managers:** ahora son imágenes sueltas. Hay que convertirlas en sistemas o quitarlas.
+- [x] **Gemas:** definir para qué sirven (acelerar proyectos, contratar talento raro, cosméticos) o eliminarlas.
+- [x] **Mensajes con decisiones:** ofertas de inversores, clientes y prensa con consecuencias.
+- [x] **Objetivo y final:** condición de victoria (llegar a "Imperio tecnológico" o a una valoración X) y derrota (bancarrota).
+- [x] **Tutorial / onboarding** de las primeras partidas: qué hacer, cómo se gana y cómo se pierde.
+- [x] **Estado inicial coherente:** hoy la partida empieza en nivel 3, con $15.430, 8.920 fans y proyectos ya al 65 %. Hay que decidir si se empieza desde cero ("Coder de habitación") como cuenta la narrativa.
 - [x] **Cancelar proyecto**, con recuperación parcial del gasto.
-- [ ] **Estadísticas e historial:** ingresos por mes y ventas por proyecto. _(v0.2: gráfica de seguidores y análisis por proyecto; falta el historial de ingresos)._
+- [x] **Estadísticas e historial:** ingresos por mes y ventas por proyecto. _(v0.3: gráficas de seguidores y balance mensual, y análisis por proyecto)._
 - [ ] Opcional: sonido y música con controles de volumen.
 
 ---
@@ -226,7 +235,7 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
 - [x] Envolver lectura y escritura de `localStorage` en `try/catch`: en modo privado o con almacenamiento lleno ahora mismo falla.
 - [x] Validar el guardado al cargarlo. Si está corrupto, avisar y ofrecer una partida nueva en vez de dejar la pantalla en blanco.
-- [ ] Añadir un número de versión dentro del guardado (`saveVersion`) y funciones de migración. Hoy cualquier cambio en el estado rompe las partidas existentes. _(v0.2: hay `saveVersion` y validación; faltan las migraciones)._
+- [x] Añadir un número de versión dentro del guardado (`saveVersion`) y funciones de migración. Hoy cualquier cambio en el estado rompe las partidas existentes. _(v0.3: `saveVersion`, validación y migración v2 → v3 en `save.js`)._
 - [x] No guardar el estado de la interfaz (`activeTab`, `paused`) como si fuera parte de la partida.
 - [ ] Exportar e importar la partida como archivo o código.
 - [ ] Opcional: varias ranuras de guardado y guardado en la nube (requiere backend y cuentas).
@@ -291,7 +300,7 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
 ### Balance
 
-- [ ] Simular partidas completas con un script y graficar dinero y nivel en el tiempo.
+- [ ] Simular partidas completas con un script y graficar dinero y nivel en el tiempo. _(Primera simulación v0.3 con un bot sensato: gana en ~58 meses de juego y acaba con más de $1M; el final es demasiado fácil y casi nunca se llega a calidad 90 para el evento de premios)._
 - [ ] Definir la duración objetivo de una partida.
 - [ ] Ajustar costes y recompensas para que no haya estrategias rotas (por ejemplo, spamear campañas).
 
