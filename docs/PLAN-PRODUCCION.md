@@ -4,7 +4,7 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 > Las referencias `App.jsx:NNN` apuntan a `src/App.jsx` en el commit `abeeaed`.
 
-> **Estado (v0.3.0):** las fases 0 a 3 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
+> **Estado (v0.4.0):** las fases 0 a 6 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
 
 ---
 
@@ -237,39 +237,39 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 - [x] Validar el guardado al cargarlo. Si está corrupto, avisar y ofrecer una partida nueva en vez de dejar la pantalla en blanco.
 - [x] Añadir un número de versión dentro del guardado (`saveVersion`) y funciones de migración. Hoy cualquier cambio en el estado rompe las partidas existentes. _(v0.3: `saveVersion`, validación y migración v2 → v3 en `save.js`)._
 - [x] No guardar el estado de la interfaz (`activeTab`, `paused`) como si fuera parte de la partida.
-- [ ] Exportar e importar la partida como archivo o código.
-- [ ] Opcional: varias ranuras de guardado y guardado en la nube (requiere backend y cuentas).
-- [ ] Opcional: progreso mientras el juego está cerrado, calculando los meses transcurridos.
+- [x] Exportar e importar la partida como archivo o código. _(v0.4: Opciones → Exportar/Importar partida, con validación y migración)._
+- [ ] Opcional: varias ranuras de guardado y guardado en la nube (requiere backend y cuentas). _(Descartado por ahora: el guardado en la nube necesita backend y cuentas (fase 9 / Modo Pro))._
+- [ ] Opcional: progreso mientras el juego está cerrado, calculando los meses transcurridos. _(Descartado: el estudio podría quebrar mientras no juegas, y eso es injusto para el jugador)._
 
 ---
 
 ## Fase 5 — Rendimiento y assets
 
-- [ ] **`public/assets` pesa 47 MB** (26 PNG, varios de más de 2,5 MB). En móvil es inaceptable.
+- [x] **`public/assets` pesa 47 MB** (26 PNG, varios de más de 2,5 MB). En móvil es inaceptable. _(v0.4: WebP redimensionado con `npm run images`: 40 MB → 1,1 MB; originales en `assets-src/`)._
   - Convertir a WebP o AVIF, con PNG como alternativa si hace falta.
   - Redimensionar al tamaño real en pantalla (1x/2x).
   - Objetivo: menos de 3 MB en total y menos de 1 MB para la primera pantalla.
-- [ ] Carga diferida (`loading="lazy"`) en las imágenes que no se ven al abrir (etapas, eventos, expansión).
-- [ ] Precargar solo `hero-start.png` y `office-scene.png`.
-- [ ] Dimensiones `width`/`height` en las imágenes para evitar saltos de maquetación.
-- [ ] Dividir el código de las pantallas con `React.lazy` si el bundle crece (hoy son 68 kB gzip, que está bien).
-- [ ] Revisar con Lighthouse: Performance mayor que 90 en móvil.
+- [x] Carga diferida (`loading="lazy"`) en las imágenes que no se ven al abrir (etapas, eventos, expansión).
+- [x] Precargar solo `hero-start.png` y `office-scene.png`. _(v0.4: se precarga `hero-start.webp`; la escena de la oficina lleva `fetchPriority="high"`)._
+- [x] Dimensiones `width`/`height` en las imágenes para evitar saltos de maquetación.
+- [x] Dividir el código de las pantallas con `React.lazy` si el bundle crece (hoy son 68 kB gzip, que está bien). _(v0.4: todas las pantallas salvo la Oficina se cargan bajo demanda y se precargan al empezar)._
+- [x] Revisar con Lighthouse: Performance mayor que 90 en móvil. _(v0.4, móvil: Rendimiento 93, Accesibilidad 100, Buenas prácticas 100, SEO 92. Falta compresión gzip en el servidor (fase 9))._
 
 ---
 
 ## Fase 6 — UX, accesibilidad y responsive
 
-- [ ] Textos alternativos (`alt`) útiles en las imágenes con contenido. Ahora todas tienen `alt=""`.
-- [ ] Navegación completa con teclado y estilos `:focus-visible` (no hay ninguno en `styles.css`).
-- [ ] Contraste AA en los textos pequeños y apagados.
-- [ ] Respetar `prefers-reduced-motion` en las animaciones.
-- [ ] Probar en 320 px, 375 px, 430 px, tablet y escritorio. Hoy solo hay dos media queries (`max-width: 430px` y `min-width: 900px`).
-- [ ] Estados vacíos: sin proyectos, sin empleados, sin IA.
-- [ ] Unificar el formato de números y moneda (hoy es `en-US` en un juego en español). Usar `Intl.NumberFormat('es-ES')` o la configuración del idioma.
-- [ ] **Internacionalización:** sacar todos los textos a archivos de idioma (es, y en si se quiere llegar a más gente).
-- [ ] Favicon, `apple-touch-icon` y `manifest.webmanifest`.
-- [ ] Metadatos `description` y Open Graph para compartir.
-- [ ] La versión `v0.1.0` está escrita a mano en `StartScreen`. Debe salir de `package.json`.
+- [x] Textos alternativos (`alt`) útiles en las imágenes con contenido. Ahora todas tienen `alt=""`. _(v0.4: la escena de la oficina, los retratos y los avatares tienen texto; las imágenes decorativas junto a texto mantienen `alt=""` a propósito)._
+- [x] Navegación completa con teclado y estilos `:focus-visible` (no hay ninguno en `styles.css`). _(v0.4: `:focus-visible`, foco atrapado en los diálogos y Esc cierra solo el de arriba)._
+- [x] Contraste AA en los textos pequeños y apagados. _(v0.4: texto oscuro en los botones verdes y rojo más claro; todas las combinaciones revisadas ≥ 4,5:1)._
+- [x] Respetar `prefers-reduced-motion` en las animaciones.
+- [x] Probar en 320 px, 375 px, 430 px, tablet y escritorio. Hoy solo hay dos media queries (`max-width: 430px` y `min-width: 900px`). _(v0.4: revisado en 320, 375, 430, 820 y 1280 px sin desbordes horizontales)._
+- [x] Estados vacíos: sin proyectos, sin empleados, sin IA.
+- [x] Unificar el formato de números y moneda (hoy es `en-US` en un juego en español). Usar `Intl.NumberFormat('es-ES')` o la configuración del idioma.
+- [ ] **Internacionalización:** sacar todos los textos a archivos de idioma (es, y en si se quiere llegar a más gente). _(Pendiente: decidir si se lanza también en inglés; si es así, sacar los textos a `src/i18n/`)._
+- [x] Favicon, `apple-touch-icon` y `manifest.webmanifest`.
+- [x] Metadatos `description` y Open Graph para compartir. _(v0.4: falta poner una URL absoluta en `og:image` cuando haya dominio (fase 9))._
+- [x] La versión `v0.1.0` está escrita a mano en `StartScreen`. Debe salir de `package.json`.
 
 ---
 

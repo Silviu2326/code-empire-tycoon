@@ -4,6 +4,7 @@ import { SAVE_VERSION } from './initialState.js';
 
 export const STORAGE_KEY = 'code-empire-tycoon-save-v2';
 const LEGACY_KEYS = ['code-empire-tycoon-save-v1'];
+const EXPORT_FORMAT = 'code-empire-tycoon-save';
 
 const REQUIRED_FIELDS = {
   month: 'number',
@@ -84,13 +85,17 @@ export function loadSave() {
   }
 }
 
+function serialize(game) {
+  // eslint-disable-next-line no-unused-vars
+  const { feedback, ...persisted } = game;
+  return { ...persisted, savedAt: Date.now() };
+}
+
 export function writeSave(game) {
   const store = storage();
   if (!store) return false;
-  // eslint-disable-next-line no-unused-vars
-  const { feedback, ...persisted } = game;
   try {
-    store.setItem(STORAGE_KEY, JSON.stringify(persisted));
+    store.setItem(STORAGE_KEY, JSON.stringify(serialize(game)));
     return true;
   } catch {
     return false;
@@ -106,4 +111,36 @@ export function clearSave() {
   } catch {
     // Sin acceso al almacenamiento no hay nada que borrar.
   }
+}
+
+/** Texto JSON de la partida, para descargarlo como archivo. */
+export function exportSave(game) {
+  return JSON.stringify({ format: EXPORT_FORMAT, game: serialize(game) }, null, 2);
+}
+
+export const exportFileName = (game) => `code-empire-nivel${game.level}-${game.year}-${String(game.month).padStart(2, '0')}.json`;
+
+/** Lee un archivo exportado (o un guardado en bruto). Devuelve `{ game }` o `{ error }`. */
+export function importSave(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return { error: 'El archivo no es un JSON válido.' };
+  }
+  const game = migrateSave(data?.format === EXPORT_FORMAT ? data.game : data);
+  if (!isValidSave(game)) return { error: 'El archivo no contiene una partida de Code Empire Tycoon compatible.' };
+  return { game };
+}
+
+export function downloadSave(game) {
+  const blob = new Blob([exportSave(game)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = exportFileName(game);
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

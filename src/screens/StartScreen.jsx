@@ -6,6 +6,15 @@ const saveNotices = {
   corrupt: 'No se ha podido leer la partida guardada. Empieza una nueva.'
 };
 
+function savedAgo(timestamp) {
+  const minutes = Math.round((Date.now() - timestamp) / 60000);
+  if (minutes < 1) return 'guardada ahora';
+  if (minutes < 60) return `hace ${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `hace ${hours} h`;
+  return new Date(timestamp).toLocaleDateString('es-ES');
+}
+
 export function StartScreen({ save, onNew, onLoad, onOptions }) {
   const notice = saveNotices[save.status];
   return (
@@ -41,6 +50,7 @@ export function StartScreen({ save, onNew, onLoad, onOptions }) {
                 Cargar partida
                 <small>
                   Nivel {save.game.level} · {formatDate(save.game)}
+                  {save.game.savedAt ? ` · ${savedAgo(save.game.savedAt)}` : ''}
                 </small>
               </>
             ) : (

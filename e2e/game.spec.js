@@ -91,3 +91,36 @@ test('la pantalla de imperio muestra etapas, managers bloqueados y eventos', asy
   await expect(page.getByRole('button', { name: 'Bloqueado' }).first()).toBeDisabled();
   await expect(page.getByText('Requisito: Nivel 4 y un producto lanzado')).toBeVisible();
 });
+
+test('exportar e importar una partida desde opciones', async ({ page }) => {
+  await newGame(page);
+  await page.getByRole('button', { name: 'Menú' }).click();
+  await page.getByRole('button', { name: 'Opciones' }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Exportar partida' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^code-empire-nivel1-2025-05\.json$/);
+  const path = await download.path();
+
+  await page.getByLabel('Archivo de partida').setInputFiles(path);
+  await page.getByRole('button', { name: 'Importar y jugar' }).click();
+  await expect(page.getByRole('navigation', { name: 'Secciones' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Menú' }).click();
+  await page.getByRole('button', { name: 'Opciones' }).click();
+  await page
+    .getByLabel('Archivo de partida')
+    .setInputFiles({ name: 'mal.json', mimeType: 'application/json', buffer: Buffer.from('{}') });
+  await expect(page.getByRole('alert')).toContainText('compatible');
+});
+
+test('Esc cierra solo el diálogo de arriba', async ({ page }) => {
+  await newGame(page);
+  await page.getByRole('button', { name: 'Menú' }).click();
+  await page.getByRole('button', { name: 'Opciones' }).click();
+  await page.getByRole('button', { name: 'Borrar partida guardada' }).click();
+  await expect(page.getByRole('dialog', { name: 'Borrar partida' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Borrar partida' })).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'Opciones' })).toBeVisible();
+});

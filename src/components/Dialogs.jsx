@@ -1,6 +1,8 @@
+import { useRef, useState } from 'react';
 import { currency, formatDate, number } from '../game/format.js';
 import { VICTORY_LEVEL } from '../data/catalog.js';
 import { BANKRUPTCY_MONTHS, computeEconomy } from '../game/rules.js';
+import { downloadSave, importSave } from '../game/save.js';
 import { Modal } from './ui.jsx';
 
 export function EconomyDialog({ game, onClose }) {
@@ -60,7 +62,23 @@ export function PauseMenu({ onResume, onOptions, onExit }) {
   );
 }
 
-export function OptionsDialog({ hasSave, onClearSave, onClose }) {
+export function OptionsDialog({ exportable, onClearSave, onImport, onClose }) {
+  const fileRef = useRef(null);
+  const [importError, setImportError] = useState(null);
+
+  async function readFile(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    const result = importSave(await file.text());
+    if (result.error) {
+      setImportError(result.error);
+    } else {
+      setImportError(null);
+      onImport(result.game);
+    }
+  }
+
   return (
     <Modal
       title="Opciones"
@@ -73,14 +91,38 @@ export function OptionsDialog({ hasSave, onClearSave, onClose }) {
     >
       <section className="options-section">
         <h3>Partida</h3>
-        <p className="hint">La partida se guarda automáticamente en este navegador.</p>
-        <button type="button" className="danger" disabled={!hasSave} onClick={onClearSave}>
+        <p className="hint">
+          La partida se guarda automáticamente en este navegador. Exporta un archivo para tener una copia o jugar en otro
+          dispositivo.
+        </p>
+        <div className="option-buttons">
+          <button type="button" className="secondary" disabled={!exportable} onClick={() => downloadSave(exportable)}>
+            Exportar partida
+          </button>
+          <button type="button" className="secondary" onClick={() => fileRef.current?.click()}>
+            Importar partida
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            aria-label="Archivo de partida"
+            onChange={readFile}
+          />
+        </div>
+        {importError && (
+          <p className="hint negative" role="alert">
+            {importError}
+          </p>
+        )}
+        <button type="button" className="danger" disabled={!exportable} onClick={onClearSave}>
           Borrar partida guardada
         </button>
       </section>
       <section className="options-section">
         <h3>Controles</h3>
-        <p className="hint">Espacio: pausar o reanudar. Esc: cerrar ventanas.</p>
+        <p className="hint">Espacio: pausar o reanudar. Tab: moverse entre botones. Esc: cerrar ventanas.</p>
       </section>
       <section className="options-section">
         <h3>Créditos</h3>

@@ -20,7 +20,7 @@ import {
   upgradeCost,
   xpToNext
 } from './rules.js';
-import { isValidSave, migrateSave } from './save.js';
+import { exportSave, importSave, isValidSave, migrateSave } from './save.js';
 import { advanceMonth } from './tick.js';
 
 const run = (state, ...actions) => actions.reduce(gameReducer, state);
@@ -348,5 +348,28 @@ describe('guardado', () => {
     expect(migrated.staff).toEqual([FOUNDER_ID, 'alice']);
     expect(migrated.maxServers).toBeUndefined();
     expect(migrated.goalsDone).toHaveLength(goals.length);
+  });
+});
+
+describe('exportar e importar', () => {
+  it('una partida exportada se importa igual', () => {
+    const game = { ...createInitialGame(), level: 7, money: 1234 };
+    const { game: imported, error } = importSave(exportSave(game));
+    expect(error).toBeUndefined();
+    expect(imported.level).toBe(7);
+    expect(imported.money).toBe(1234);
+    expect(imported.savedAt).toBeTypeOf('number');
+  });
+
+  it('acepta guardados en bruto de versiones anteriores y los migra', () => {
+    // eslint-disable-next-line no-unused-vars
+    const { managers, upgrades, ...rest } = createInitialGame();
+    const { game } = importSave(JSON.stringify({ ...rest, saveVersion: 2, maxServers: 3 }));
+    expect(game.saveVersion).toBe(SAVE_VERSION);
+  });
+
+  it('rechaza archivos que no son partidas', () => {
+    expect(importSave('no es json').error).toMatch(/JSON/);
+    expect(importSave('{"hola": 1}').error).toMatch(/compatible/);
   });
 });

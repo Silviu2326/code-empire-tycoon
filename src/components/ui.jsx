@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { assets, spritePositions } from '../data/assets.js';
+import { assets, imageSize, spritePositions } from '../data/assets.js';
 
 export function Stat({ icon, label, value, tone }) {
   return (
@@ -92,7 +92,7 @@ export function ProjectIcon({ project, locked = false }) {
   return (
     <div className={`project-icon ${locked ? 'locked' : ''}`}>
       {image ? (
-        <img src={image} alt="" />
+        <img src={image} alt="" {...imageSize.icon} />
       ) : (
         <GridSprite image={assets.empire.products} index={project.icon || 0} className="fill" />
       )}
@@ -172,6 +172,10 @@ export function ChoiceGrid({ title, options, value, onChange }) {
   );
 }
 
+// Pila de diálogos abiertos: solo el de arriba responde a Esc y atrapa el foco.
+const openModals = [];
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([hidden]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
 export function Modal({ title, onClose, children, actions }) {
   const dialogRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -181,14 +185,36 @@ export function Modal({ title, onClose, children, actions }) {
   });
 
   useEffect(() => {
+    const dialog = dialogRef.current;
     const previous = document.activeElement;
-    dialogRef.current?.querySelector('button, [href], input')?.focus();
+    openModals.push(dialog);
+    dialog?.querySelector(FOCUSABLE)?.focus();
     const onKey = (event) => {
-      if (event.key === 'Escape') onCloseRef.current?.();
+      if (openModals[openModals.length - 1] !== dialog) return;
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        onCloseRef.current?.();
+      } else if (event.key === 'Tab') {
+        const items = [...dialog.querySelectorAll(FOCUSABLE)];
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        } else if (!dialog.contains(document.activeElement)) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('keydown', onKey);
+      openModals.splice(openModals.indexOf(dialog), 1);
       previous?.focus?.();
     };
   }, []);
@@ -199,17 +225,22 @@ export function Modal({ title, onClose, children, actions }) {
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={`${titleId(title)}`}
         ref={dialogRef}
         onClick={(event) => event.stopPropagation()}
       >
-        <h2>{title}</h2>
+        <h2 id={titleId(title)}>{title}</h2>
         <div className="modal-body">{children}</div>
         {actions && <div className="modal-actions">{actions}</div>}
       </div>
     </div>
   );
 }
+
+const titleId = (title) =>
+  `dialog-${String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')}`;
 
 export function ConfirmDialog({ request, onClose }) {
   return (

@@ -18,6 +18,7 @@ Juego de gestión para el navegador: empiezas programando en tu habitación y co
 | `npm run format`   | Formatea con Prettier (`format:check` solo comprueba)                 |
 | `npm test`         | Tests unitarios de la lógica (Vitest)                                 |
 | `npm run test:e2e` | Tests de extremo a extremo (Playwright; compila y arranca la preview) |
+| `npm run images`   | Regenera las imágenes WebP de `public/assets` desde `assets-src/`     |
 | `npm run check`    | Lint + formato + tests + build (lo mismo que la CI, salvo e2e)        |
 
 Los tests e2e necesitan Chromium: `npx playwright install chromium`, o apuntar a uno ya instalado con `PLAYWRIGHT_CHROMIUM_PATH=/ruta/a/chrome`.
@@ -37,6 +38,8 @@ src/
     initialState.js  partida inicial
   components/  piezas reutilizables (barra superior, diálogos, UI)
   screens/     una pantalla por archivo
+assets-src/    imágenes originales en PNG (no se publican)
+scripts/       optimize-images.mjs: genera WebP e iconos de la app
 e2e/           tests de Playwright
 docs/          plan de producción y análisis del Modo Pro
 ```

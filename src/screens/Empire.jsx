@@ -1,6 +1,6 @@
 import { useGame } from '../components/GameContext.js';
 import { ExecutivePortrait, GridSprite, ScreenTitle } from '../components/ui.jsx';
-import { assets } from '../data/assets.js';
+import { assets, imageSize } from '../data/assets.js';
 import { empireStages, managers, upgrades } from '../data/catalog.js';
 import { currency } from '../game/format.js';
 import { empireEvents } from '../game/events.js';
@@ -31,17 +31,17 @@ function Roadmap() {
         </span>
       </div>
       <div className="founder-split">
-        <img src={assets.founder.early} alt="El fundador al empezar" />
+        <img src={assets.founder.early} alt="El fundador al empezar" {...imageSize.founder} />
         <div>
           <strong>De vibe coder a CEO</strong>
           <span>Llega a la etapa «Imperio tecnológico» (nivel 15) sin quebrar para ganar la partida.</span>
         </div>
-        <img src={assets.founder.ceo} alt="El fundador como CEO" />
+        <img src={assets.founder.ceo} alt="El fundador como CEO" {...imageSize.founder} />
       </div>
       <div className="stage-strip">
         {empireStages.map((stage, index) => (
           <article className={index <= unlocked ? 'stage-card unlocked' : 'stage-card'} key={stage.title}>
-            <img src={assets.stages[index]} alt="" loading="lazy" />
+            <img src={assets.stages[index]} alt="" {...imageSize.scene} loading="lazy" />
             <div>
               <small>
                 Nivel {stage.level} {index <= unlocked ? '· desbloqueada' : ''}
@@ -190,7 +190,7 @@ function Events() {
           const status = statusOf(event);
           return (
             <article className={status.locked ? 'event-card locked' : 'event-card'} key={event.id}>
-              <img src={assets.events[event.image]} alt="" loading="lazy" />
+              <img src={assets.events[event.image]} alt="" {...imageSize.event} loading="lazy" />
               <div>
                 <h3>{event.title}</h3>
                 <p>{event.subtitle}</p>

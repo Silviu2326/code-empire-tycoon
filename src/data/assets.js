@@ -1,41 +1,49 @@
-const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
+// Las imágenes se generan con `npm run images` a partir de assets-src/ (ver scripts/optimize-images.mjs).
+const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}.webp`;
+
+// Tamaños reales de las imágenes generadas, para reservar espacio y evitar saltos de maquetación.
+export const imageSize = {
+  scene: { width: 1200, height: 675 },
+  landscape: { width: 1000, height: 563 },
+  event: { width: 720, height: 405 },
+  hero: { width: 900, height: 1599 },
+  founder: { width: 240, height: 240 },
+  icon: { width: 256, height: 256 }
+};
 
 export const assets = {
-  hero: asset('hero-start.png'),
-  office: asset('office-scene.png'),
-  landscape: asset('project-landscape.png'),
+  hero: asset('hero-start'),
+  landscape: asset('project-landscape'),
   projects: {
-    sword: asset('icon-code-quest.png'),
-    terminal: asset('icon-ai-assistant.png'),
-    city: asset('icon-cyber-streets.png')
+    sword: asset('icon-code-quest'),
+    terminal: asset('icon-ai-assistant'),
+    city: asset('icon-cyber-streets')
   },
-  portraits: asset('employee-portraits.png'),
-  aiTools: asset('ai-tools.png'),
-  marketing: asset('marketing-icons.png'),
+  portraits: asset('employee-portraits'),
+  aiTools: asset('ai-tools'),
+  marketing: asset('marketing-icons'),
   stages: [
-    asset('stage-bedroom-coder.png'),
-    asset('stage-garage-startup.png'),
-    asset('stage-growing-studio.png'),
-    asset('stage-corporate-hq.png'),
-    asset('stage-empire-tower.png')
+    asset('stage-bedroom-coder'),
+    asset('stage-garage-startup'),
+    asset('stage-growing-studio'),
+    asset('stage-corporate-hq'),
+    asset('stage-empire-tower')
   ],
   founder: {
-    early: asset('founder-early.png'),
-    ceo: asset('founder-ceo.png')
+    early: asset('founder-early'),
+    ceo: asset('founder-ceo')
   },
   empire: {
-    globalMap: asset('empire-global-map.png'),
-    dataCenter: asset('empire-data-center.png'),
-    upgrades: asset('sheet-upgrades.png'),
-    products: asset('sheet-products.png'),
-    executives: asset('sheet-executives.png')
+    upgrades: asset('sheet-upgrades'),
+    products: asset('sheet-products'),
+    executives: asset('sheet-executives')
   },
   events: [
-    asset('event-investor-pitch.png'),
-    asset('event-product-launch.png'),
-    asset('event-ipo.png'),
-    asset('event-acquisition.png'),
-    asset('event-awards.png')
+    asset('event-investor-pitch'),
+    asset('event-product-launch'),
+    asset('event-ipo'),
+    asset('event-acquisition'),
+    asset('event-awards')
   ]
 };
 

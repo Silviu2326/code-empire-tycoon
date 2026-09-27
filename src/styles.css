@@ -11,7 +11,7 @@
   --green-2: #229d53;
   --gold: #ffb931;
   --blue: #38bdf8;
-  --red: #f87171;
+  --red: #fb8c8c;
   --shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
   font-family:
     Inter,
@@ -246,6 +246,10 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.start-actions button.primary {
+  background: linear-gradient(180deg, var(--green), var(--green-2));
+}
+
 .start-actions button,
 .office-actions button {
   min-height: 48px;
@@ -258,7 +262,7 @@ button:disabled {
 .primary {
   background: linear-gradient(180deg, var(--green), var(--green-2));
   box-shadow: 0 8px 22px rgba(37, 192, 99, 0.26);
-  color: white;
+  color: #04130a;
   font-weight: 900;
 }
 
@@ -1673,6 +1677,12 @@ button:disabled {
   color: var(--gold);
 }
 
+.option-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1700,7 +1710,7 @@ button:disabled {
   }
 
   .topbar {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(9, minmax(0, 1fr));
   }
 
   .income {
@@ -1718,6 +1728,28 @@ button:disabled {
 
   .pixel-office:not(.hero) {
     min-height: 380px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    gap: 5px;
+    padding: 10px 8px 6px;
+  }
+
+  .pill,
+  .calendar,
+  .square {
+    min-height: 34px;
+    font-size: 0.74rem;
+  }
+
+  .bottom-nav button {
+    font-size: 0.66rem;
+  }
+
+  .screen-body {
+    padding: 10px 10px 14px;
   }
 }
 

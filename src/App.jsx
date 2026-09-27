@@ -1,21 +1,29 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 import { EconomyDialog, GameOverDialog, IntroDialog, OptionsDialog, PauseMenu, VictoryDialog } from './components/Dialogs.jsx';
 import { GameContext } from './components/GameContext.js';
 import { BottomNav, TopBar } from './components/TopBar.jsx';
 import { ConfirmDialog, Toast } from './components/ui.jsx';
+import { formatDate } from './game/format.js';
 import { createInitialGame } from './game/initialState.js';
 import { gameReducer } from './game/reducer.js';
 import { clearSave, loadSave, writeSave } from './game/save.js';
-import { AiScreen } from './screens/AiScreen.jsx';
-import { CreateProject } from './screens/CreateProject.jsx';
-import { Empire } from './screens/Empire.jsx';
-import { Employees } from './screens/Employees.jsx';
-import { Marketing } from './screens/Marketing.jsx';
 import { Office } from './screens/Office.jsx';
-import { ProjectDetail } from './screens/ProjectDetail.jsx';
-import { Projects } from './screens/Projects.jsx';
 import { StartScreen } from './screens/StartScreen.jsx';
+
+// La oficina se carga al momento; el resto de pantallas, bajo demanda.
+const screenLoaders = [];
+const lazyScreen = (load, name) => {
+  screenLoaders.push(load);
+  return lazy(() => load().then((module) => ({ default: module[name] })));
+};
+const Projects = lazyScreen(() => import('./screens/Projects.jsx'), 'Projects');
+const CreateProject = lazyScreen(() => import('./screens/CreateProject.jsx'), 'CreateProject');
+const ProjectDetail = lazyScreen(() => import('./screens/ProjectDetail.jsx'), 'ProjectDetail');
+const AiScreen = lazyScreen(() => import('./screens/AiScreen.jsx'), 'AiScreen');
+const Employees = lazyScreen(() => import('./screens/Employees.jsx'), 'Employees');
+const Marketing = lazyScreen(() => import('./screens/Marketing.jsx'), 'Marketing');
+const Empire = lazyScreen(() => import('./screens/Empire.jsx'), 'Empire');
 
 const MONTH_MS = 4200;
 const TOAST_MS = 3000;
@@ -82,6 +90,13 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [playing, menuOpen]);
 
+  // Una vez en la partida, precarga el resto de pantallas para que no haya esperas al navegar.
+  useEffect(() => {
+    if (!playing) return undefined;
+    const timer = window.setTimeout(() => screenLoaders.forEach((load) => load()), 1000);
+    return () => window.clearTimeout(timer);
+  }, [playing]);
+
   const navigate = useCallback((tab, extra = {}) => {
     setUi({ tab, ...extra });
   }, []);
@@ -137,11 +152,29 @@ function App() {
     });
   }
 
+  function requestImport(imported) {
+    ask({
+      title: 'Importar partida',
+      text: `Se cargará la partida importada (nivel ${imported.level}, ${formatDate(imported)}) y sustituirá a la actual.`,
+      confirmLabel: 'Importar y jugar',
+      danger: Boolean(save.game) || playing,
+      onConfirm: () => {
+        writeSave(imported);
+        setSave(loadSave());
+        dispatch({ type: 'LOAD', game: imported });
+        setUi({ tab: 'office' });
+        setModal(null);
+        setPlaying(true);
+      }
+    });
+  }
+
   const confirmDialog = confirm && <ConfirmDialog request={confirm} onClose={() => setConfirm(null)} />;
   const optionsDialog = modal === 'options' && (
     <OptionsDialog
-      hasSave={Boolean(save.game) || playing}
+      exportable={playing ? game : save.game}
       onClearSave={requestClearSave}
+      onImport={requestImport}
       onClose={() => setModal(playing ? 'menu' : null)}
     />
   );
@@ -163,7 +196,9 @@ function App() {
         <section className="phone-frame">
           <TopBar onOpenMenu={() => setModal('menu')} onOpenEconomy={() => setModal('economy')} />
           <div className="screen-body">
-            <Screen key={`${ui.tab}-${ui.projectId || ''}-${ui.ideaId || ''}`} />
+            <Suspense fallback={<p className="hint">Cargando…</p>}>
+              <Screen key={`${ui.tab}-${ui.projectId || ''}-${ui.ideaId || ''}`} />
+            </Suspense>
           </div>
           <BottomNav />
           <Toast feedback={toast} />
