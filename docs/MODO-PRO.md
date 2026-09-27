@@ -3,6 +3,7 @@
 **Idea:** un modo en el que lo que haces en el juego ocurre de verdad. Cuando creas un proyecto, unos agentes de IA construyen un juego o una app real, que se publica y puede generar ingresos. El jugador puede ganar dinero con sus productos, y la plataforma gana como intermediaria.
 
 **Conclusión:**
+
 - **Técnicamente es viable hoy.** Lo difícil no es construir los productos, sino **venderlos**.
 - **El "todos ganamos" es la parte con más riesgo legal.** El modo Pro funciona si se plantea como **"construye productos reales con IA desde un juego"**, y no como **"gana dinero jugando"**.
 
@@ -12,16 +13,16 @@
 
 ## 1. Qué se vuelve real
 
-| En el juego | En el modo Pro |
-|---|---|
-| Crear proyecto (género, estilo, tamaño) | Un agente de IA programa un juego o app web real y entrega una URL jugable |
-| Empleados con habilidades | Agentes especializados: programación, arte, pruebas y revisión. La "habilidad" del empleado es el modelo y el nivel de esfuerzo que usa |
-| Herramientas IA | Servicios reales de texto, imagen y audio, que tienen coste |
-| Servidores | Hosting real de los productos publicados |
-| Barra de progreso y calidad | Progreso real del agente y puntuación de sus pruebas automáticas |
-| Marketing | Publicar en la galería o en redes. Los anuncios de pago solo con aprobación explícita del jugador y un tope de gasto |
-| Tienda | Marketplace donde otros juegan, compran o dejan propinas |
-| Mensajes | Opiniones reales de jugadores, estadísticas y avisos de moderación |
+| En el juego                             | En el modo Pro                                                                                                                          |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Crear proyecto (género, estilo, tamaño) | Un agente de IA programa un juego o app web real y entrega una URL jugable                                                              |
+| Empleados con habilidades               | Agentes especializados: programación, arte, pruebas y revisión. La "habilidad" del empleado es el modelo y el nivel de esfuerzo que usa |
+| Herramientas IA                         | Servicios reales de texto, imagen y audio, que tienen coste                                                                             |
+| Servidores                              | Hosting real de los productos publicados                                                                                                |
+| Barra de progreso y calidad             | Progreso real del agente y puntuación de sus pruebas automáticas                                                                        |
+| Marketing                               | Publicar en la galería o en redes. Los anuncios de pago solo con aprobación explícita del jugador y un tope de gasto                    |
+| Tienda                                  | Marketplace donde otros juegan, compran o dejan propinas                                                                                |
+| Mensajes                                | Opiniones reales de jugadores, estadísticas y avisos de moderación                                                                      |
 
 El gran atractivo: la barra de progreso deja de ser simulada y muestra el trabajo real del agente en directo.
 
@@ -37,21 +38,22 @@ El gran atractivo: la barra de progreso deja de ser simulada y muestra el trabaj
 
 Estimación para un juego HTML5 pequeño: entre 30 y 60 pasos de agente, con caché activada y algunas rondas de corrección. Precios oficiales de Anthropic por millón de tokens a fecha del documento.
 
-| Modelo | Precio entrada / salida (por millón de tokens) | Coste aproximado por proyecto pequeño |
-|---|---|---|
-| Claude Sonnet 5 | $2 / $10 | 1 – 5 $ |
-| Claude Opus 5 | $5 / $25 | 3 – 15 $ |
+| Modelo          | Precio entrada / salida (por millón de tokens) | Coste aproximado por proyecto pequeño |
+| --------------- | ---------------------------------------------- | ------------------------------------- |
+| Claude Sonnet 5 | $2 / $10                                       | 1 – 5 $                               |
+| Claude Opus 5   | $5 / $25                                       | 3 – 15 $                              |
 
 **Otros costes:**
 
-| Concepto | Coste aproximado |
-|---|---|
-| Hosting de cada producto publicado | Céntimos al mes |
-| Generación de imágenes y audio | Según el servicio, por cada recurso generado |
-| Comisión de Stripe | Alrededor de 1,5–3 % + 0,25 € por cobro |
-| Proyectos grandes o "AAA" | 10 veces o más el coste de uno pequeño |
+| Concepto                           | Coste aproximado                             |
+| ---------------------------------- | -------------------------------------------- |
+| Hosting de cada producto publicado | Céntimos al mes                              |
+| Generación de imágenes y audio     | Según el servicio, por cada recurso generado |
+| Comisión de Stripe                 | Alrededor de 1,5–3 % + 0,25 € por cobro      |
+| Proyectos grandes o "AAA"          | 10 veces o más el coste de uno pequeño       |
 
 **Cómo recortar costes:**
+
 - Usar Sonnet para los agentes que hacen tareas sencillas.
 - Reservar Opus para planificar y revisar.
 - Aprovechar la caché de prompts.
@@ -61,10 +63,10 @@ Estimación para un juego HTML5 pequeño: entre 30 y 60 pasos de agente, con cac
 
 ### Cómo se ejecutan los agentes
 
-| Opción | Ventajas | Inconvenientes |
-|---|---|---|
-| **Claude Managed Agents** | Anthropic ejecuta el agente y le da un entorno aislado para trabajar. Es lo más rápido para el prototipo | Menos control sobre la infraestructura |
-| **Claude Agent SDK** | Más control y más barato a gran escala | Hay que mantener tú los servidores y el aislamiento |
+| Opción                    | Ventajas                                                                                                 | Inconvenientes                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Claude Managed Agents** | Anthropic ejecuta el agente y le da un entorno aislado para trabajar. Es lo más rápido para el prototipo | Menos control sobre la infraestructura              |
+| **Claude Agent SDK**      | Más control y más barato a gran escala                                                                   | Hay que mantener tú los servidores y el aislamiento |
 
 **Recomendación:** empezar con Managed Agents en la fase A y reevaluar al escalar.
 
@@ -72,20 +74,21 @@ Estimación para un juego HTML5 pequeño: entre 30 y 60 pasos de agente, con cac
 
 ## 3. Modelo de negocio
 
-| Quién | Cómo gana | Qué tan seguro es |
-|---|---|---|
-| **La plataforma** | Margen sobre los créditos. Ejemplo: 10 € de créditos, unos 3–4 € de IA y hosting, unos 5 € de margen tras Stripe | **Seguro.** Es el ingreso principal |
-| **La plataforma** | Comisión del 10–20 % sobre las ventas y propinas del marketplace | Depende de que los productos vendan |
-| **La plataforma** | Suscripción Pro mensual (créditos incluidos, prioridad en la cola, modelos mejores) | Ingreso recurrente |
-| **El jugador** | Ventas, propinas o anuncios de sus productos | **Nada seguro:** la mayoría ganará 0 € |
+| Quién             | Cómo gana                                                                                                        | Qué tan seguro es                      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **La plataforma** | Margen sobre los créditos. Ejemplo: 10 € de créditos, unos 3–4 € de IA y hosting, unos 5 € de margen tras Stripe | **Seguro.** Es el ingreso principal    |
+| **La plataforma** | Comisión del 10–20 % sobre las ventas y propinas del marketplace                                                 | Depende de que los productos vendan    |
+| **La plataforma** | Suscripción Pro mensual (créditos incluidos, prioridad en la cola, modelos mejores)                              | Ingreso recurrente                     |
+| **El jugador**    | Ventas, propinas o anuncios de sus productos                                                                     | **Nada seguro:** la mayoría ganará 0 € |
 
 **Realidad del mercado:** ya hay muchísimos juegos y apps hechos con IA, y lo difícil es conseguir usuarios, no escribir el código. Si se vende como "ganas dinero", la mayoría pagará más de lo que ingresa, se sentirá engañada y habrá reclamaciones.
 
 Lo que de verdad se le ofrece al jugador es:
+
 - la experiencia del tycoon con consecuencias reales;
 - ser dueño de productos reales, con código exportable;
 - aprender a crear y lanzar productos;
-- la *posibilidad*, no la promesa, de ingresos.
+- la _posibilidad_, no la promesa, de ingresos.
 
 ---
 
@@ -98,6 +101,7 @@ Lo que de verdad se le ofrece al jugador es:
 Si alguien paga esperando beneficios que dependen sobre todo del trabajo de otros (la plataforma y la IA), puede considerarse un producto de inversión regulado: CNMV en España, SEC en EE. UU. (test de Howey).
 
 **Para evitarlo:**
+
 - No prometer ni mostrar rentabilidades ("invierte 10 € y gana…").
 - Que el jugador sea el dueño del producto y tome las decisiones: qué construir, dónde publicar, qué precio poner.
 - No juntar el dinero de varios usuarios ni repartir beneficios comunes.
@@ -149,19 +153,19 @@ El juego actual funciona solo en el navegador y guarda en `localStorage`. El mod
                                                   [Hosting en dominio aislado]
 ```
 
-| Pieza | Para qué |
-|---|---|
-| Autenticación | Cuentas de usuario y verificación de edad |
-| Base de datos (p. ej. Postgres) | Usuarios, proyectos, créditos, ventas, costes |
-| Pagos | Stripe para los créditos y suscripciones; Stripe Connect para pagar a los creadores |
-| Cola de trabajos | Ejecutar los proyectos sin bloquear la web, con reintentos |
-| Ejecutor de agentes | Managed Agents o Agent SDK, con límite de gasto por proyecto |
-| Progreso en tiempo real | Enviar al juego el avance real del agente |
-| Almacenamiento (S3 / R2) | Código y builds de cada proyecto |
+| Pieza                           | Para qué                                                                                                                                                               |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Autenticación                   | Cuentas de usuario y verificación de edad                                                                                                                              |
+| Base de datos (p. ej. Postgres) | Usuarios, proyectos, créditos, ventas, costes                                                                                                                          |
+| Pagos                           | Stripe para los créditos y suscripciones; Stripe Connect para pagar a los creadores                                                                                    |
+| Cola de trabajos                | Ejecutar los proyectos sin bloquear la web, con reintentos                                                                                                             |
+| Ejecutor de agentes             | Managed Agents o Agent SDK, con límite de gasto por proyecto                                                                                                           |
+| Progreso en tiempo real         | Enviar al juego el avance real del agente                                                                                                                              |
+| Almacenamiento (S3 / R2)        | Código y builds de cada proyecto                                                                                                                                       |
 | **Hosting en dominio separado** | Los juegos generados se sirven en otro dominio (p. ej. `*.juegos-usuarios.com`) con reglas de seguridad estrictas, para que su código no pueda atacar la web principal |
-| Moderación | Revisar contenido y código antes de publicar |
-| Observabilidad | Registros, alertas y un panel de costes |
-| Límites | Topes de gasto por usuario, por día y globales, para que un error no cueste miles de euros |
+| Moderación                      | Revisar contenido y código antes de publicar                                                                                                                           |
+| Observabilidad                  | Registros, alertas y un panel de costes                                                                                                                                |
+| Límites                         | Topes de gasto por usuario, por día y globales, para que un error no cueste miles de euros                                                                             |
 
 ### Control del gasto
 
@@ -215,15 +219,15 @@ El juego actual funciona solo en el navegador y guarda en `localStorage`. El mod
 
 ## 7. Riesgos de negocio y cómo mitigarlos
 
-| Riesgo | Mitigación |
-|---|---|
-| Juegos generados de baja calidad | Plantillas y géneros acotados, agente de pruebas y revisión, iteración |
-| Coste de IA mayor que lo que se cobra | Medirlo en la fase A, límites de gasto por proyecto, modelos más baratos para subtareas |
-| Productos que no venden y jugadores frustrados | No prometer ingresos; valor en la experiencia y en ser dueño del producto |
-| Abuso (phishing, malware, plagio) | Moderación, dominio aislado, reportes, baneos |
-| Problemas regulatorios | Asesoría legal antes de la fase B; nada de rentabilidades ni fondos comunes |
-| Dependencia de un solo proveedor de IA | Separar el ejecutor de agentes del resto del backend |
-| Menores usando pagos | Verificación de edad y KYC antes de cobrar o recibir pagos |
+| Riesgo                                         | Mitigación                                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Juegos generados de baja calidad               | Plantillas y géneros acotados, agente de pruebas y revisión, iteración                  |
+| Coste de IA mayor que lo que se cobra          | Medirlo en la fase A, límites de gasto por proyecto, modelos más baratos para subtareas |
+| Productos que no venden y jugadores frustrados | No prometer ingresos; valor en la experiencia y en ser dueño del producto               |
+| Abuso (phishing, malware, plagio)              | Moderación, dominio aislado, reportes, baneos                                           |
+| Problemas regulatorios                         | Asesoría legal antes de la fase B; nada de rentabilidades ni fondos comunes             |
+| Dependencia de un solo proveedor de IA         | Separar el ejecutor de agentes del resto del backend                                    |
+| Menores usando pagos                           | Verificación de edad y KYC antes de cobrar o recibir pagos                              |
 
 ---
 

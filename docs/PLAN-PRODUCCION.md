@@ -4,43 +4,45 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 > Las referencias `App.jsx:NNN` apuntan a `src/App.jsx` en el commit `abeeaed`.
 
+> **Estado (v0.2.0):** las fases 0, 1 y 2 están implementadas. Lo que queda abierto en ellas está sin marcar y con una nota.
+
 ---
 
 ## Resumen de fases
 
-| Fase | Objetivo | Bloquea el lanzamiento |
-|---|---|---|
-| 0 | Base técnica: dependencias, estructura, lint, tests, CI | Sí |
-| 1 | Corregir bugs de lógica y economía | Sí |
-| 2 | Revisar todos los botones: que ninguno esté muerto ni haga trampas | Sí |
-| 3 | Completar mecánicas (progresión, eventos, gemas, fin de partida) | Sí |
-| 4 | Guardado robusto | Sí |
-| 5 | Rendimiento y assets (47 MB de PNG) | Sí |
-| 6 | UX, accesibilidad y responsive | Sí |
-| 7 | Legal y marcas | Sí |
-| 8 | QA y balance | Sí |
-| 9 | Despliegue e infraestructura | Sí |
-| 10 | Lanzamiento y post-lanzamiento | No |
+| Fase | Objetivo                                                           | Bloquea el lanzamiento |
+| ---- | ------------------------------------------------------------------ | ---------------------- |
+| 0    | Base técnica: dependencias, estructura, lint, tests, CI            | Sí                     |
+| 1    | Corregir bugs de lógica y economía                                 | Sí                     |
+| 2    | Revisar todos los botones: que ninguno esté muerto ni haga trampas | Sí                     |
+| 3    | Completar mecánicas (progresión, eventos, gemas, fin de partida)   | Sí                     |
+| 4    | Guardado robusto                                                   | Sí                     |
+| 5    | Rendimiento y assets (47 MB de PNG)                                | Sí                     |
+| 6    | UX, accesibilidad y responsive                                     | Sí                     |
+| 7    | Legal y marcas                                                     | Sí                     |
+| 8    | QA y balance                                                       | Sí                     |
+| 9    | Despliegue e infraestructura                                       | Sí                     |
+| 10   | Lanzamiento y post-lanzamiento                                     | No                     |
 
 ---
 
 ## Fase 0 — Base técnica
 
-- [ ] **Fijar versiones de las dependencias.** `package.json` usa `"latest"` en react, react-dom, vite y @vitejs/plugin-react: cualquier `npm install` puede romper el build. Hay que poner versiones concretas (`^x.y.z`) y confiar en el `package-lock.json`.
-- [ ] Mover `vite` y `@vitejs/plugin-react` a `devDependencies`.
-- [ ] Añadir `engines.node` en `package.json` y un `.nvmrc`.
-- [ ] **Dividir `App.jsx`** (786 líneas, todo en un archivo):
+- [x] **Fijar versiones de las dependencias.** `package.json` usa `"latest"` en react, react-dom, vite y @vitejs/plugin-react: cualquier `npm install` puede romper el build. Hay que poner versiones concretas (`^x.y.z`) y confiar en el `package-lock.json`.
+- [x] Mover `vite` y `@vitejs/plugin-react` a `devDependencies`.
+- [x] Añadir `engines.node` en `package.json` y un `.nvmrc`.
+- [x] **Dividir `App.jsx`** (786 líneas, todo en un archivo):
   - `src/data/` — catálogos: proyectos, IA, candidatos, campañas, etapas, eventos.
   - `src/game/` — lógica pura sin React: `advanceMonth`, economía, acciones (contratar, comprar, crear proyecto…).
   - `src/screens/` — una pantalla por archivo (Office, Projects, CreateProject, ProjectDetail, AiScreen, Employees, Store, StartScreen).
   - `src/components/` — piezas reutilizables (Stat, Avatar, ToolRow, ScreenTitle, BottomNav…).
-- [ ] Pasar el estado a un `useReducer` con acciones con nombre (`HIRE`, `BUY_AI`, `CREATE_PROJECT`, `TICK`…). Así toda la lógica vive en un único sitio y se puede testear.
-- [ ] Añadir ESLint (con `eslint-plugin-react-hooks`) y Prettier.
-- [ ] Añadir Vitest para la lógica y Playwright para pruebas de extremo a extremo.
+- [x] Pasar el estado a un `useReducer` con acciones con nombre (`HIRE`, `BUY_AI`, `CREATE_PROJECT`, `TICK`…). Así toda la lógica vive en un único sitio y se puede testear.
+- [x] Añadir ESLint (con `eslint-plugin-react-hooks`) y Prettier.
+- [x] Añadir Vitest para la lógica y Playwright para pruebas de extremo a extremo.
 - [ ] Opcional, pero recomendado: migrar a TypeScript o, como mínimo, tipar el estado con JSDoc.
-- [ ] CI con GitHub Actions: `install → lint → test → build` en cada PR.
-- [ ] `README.md` con la descripción del juego, los requisitos y los comandos (`dev`, `build`, `serve`, `test`).
-- [ ] Borrar `.commandcode/` (es un archivo vacío de otra herramienta) o añadirlo a `.gitignore`.
+- [x] CI con GitHub Actions: `install → lint → test → build` en cada PR.
+- [x] `README.md` con la descripción del juego, los requisitos y los comandos (`dev`, `build`, `serve`, `test`).
+- [ ] Borrar `.commandcode/` (es un archivo vacío de otra herramienta) o añadirlo a `.gitignore`. _(Pendiente: decidir si se sigue usando CommandCode)._
 
 ---
 
@@ -48,45 +50,45 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 ### Economía
 
-- [ ] **Salario cobrado dos veces.** `hire()` (`App.jsx:260`) cobra el salario al contratar, y `advanceMonth` lo vuelve a cobrar ese mismo mes. Hay que elegir entre pagar solo mensualmente o cobrar una prima de contratación separada y claramente indicada.
-- [ ] **Precio de la IA incoherente.** El botón dice `$20/mes`, pero `buyAi()` (`App.jsx:249`) cobra `price * 40` ($800) de golpe y además la cuota mensual. Hay que mostrar el coste real o cobrar solo la cuota.
-- [ ] **Los proyectos solo pagan una vez.** Al llegar al 100 % se cobra un pago único, aunque el mensaje diga "ya genera ingresos". Hay que implementar ventas recurrentes que vayan bajando con el tiempo, basadas en calidad, fans y lista de deseados.
-- [ ] **No existe la bancarrota.** `money` se queda en `Math.max(0, …)` (`App.jsx:212`). Faltan saldo negativo, deuda o aviso, y un game over o rescate.
-- [ ] `salesForecast` y `wishlist` crecen, pero no afectan a nada. Deben alimentar las ventas del lanzamiento.
-- [ ] `monthlyIncome` se calcula en dos sitios (`App.jsx:169` y `App.jsx:235`). Hay que unificarlo y mostrar el **neto** (ingresos − salarios − IA), no solo los ingresos brutos.
+- [x] **Salario cobrado dos veces.** `hire()` (`App.jsx:260`) cobra el salario al contratar, y `advanceMonth` lo vuelve a cobrar ese mismo mes. Hay que elegir entre pagar solo mensualmente o cobrar una prima de contratación separada y claramente indicada.
+- [x] **Precio de la IA incoherente.** El botón dice `$20/mes`, pero `buyAi()` (`App.jsx:249`) cobra `price * 40` ($800) de golpe y además la cuota mensual. Hay que mostrar el coste real o cobrar solo la cuota.
+- [x] **Los proyectos solo pagan una vez.** Al llegar al 100 % se cobra un pago único, aunque el mensaje diga "ya genera ingresos". Hay que implementar ventas recurrentes que vayan bajando con el tiempo, basadas en calidad, fans y lista de deseados.
+- [x] **No existe la bancarrota.** `money` se queda en `Math.max(0, …)` (`App.jsx:212`). Faltan saldo negativo, deuda o aviso, y un game over o rescate.
+- [x] `salesForecast` y `wishlist` crecen, pero no afectan a nada. Deben alimentar las ventas del lanzamiento.
+- [x] `monthlyIncome` se calcula en dos sitios (`App.jsx:169` y `App.jsx:235`). Hay que unificarlo y mostrar el **neto** (ingresos − salarios − IA), no solo los ingresos brutos.
 
 ### Proyectos
 
-- [ ] **Los servidores no se liberan.** `createProject` resta un servidor, pero nada lo devuelve al completar el proyecto. Hay que liberarlo en `advanceMonth` cuando `completedNow`.
-- [ ] `createProject` (`App.jsx:271`) no comprueba el dinero ni los servidores; solo lo hace el botón. La validación debe estar dentro de la acción.
-- [ ] **El equipo queda congelado al crear el proyecto.** Se asignan `staff.slice(0, 3)` y `ownedAi.slice(0, 2)`, y no se pueden cambiar después. Hay que poder asignar y quitar empleados e IA en cada proyecto.
-- [ ] Un mismo empleado puede estar en varios proyectos a la vez y rinde al 100 % en todos. Hay que repartir su dedicación o limitarle a un proyecto.
-- [ ] La fecha límite está fija (`'Dic 2025'`). Debe calcularse a partir de la fecha del juego y la velocidad estimada.
-- [ ] La calidad inicial es fija (48) y no depende del género, el estilo ni las tecnologías.
-- [ ] Las tecnologías no afectan a nada salvo a la recompensa, y el botón "+" solo añade "Multijugador" (ver fase 2).
-- [ ] El proyecto "idea" `p3` (Cyber Streets) no se puede iniciar. Al pulsarlo va a la pantalla de crear, pero con los valores por defecto, no con los suyos.
-- [ ] El icono del proyecto se elige solo por género y cae en `terminal` para Aventura y Estrategia. Hacen falta iconos por género.
-- [ ] `ProjectDetail` usa `game.projects[0]` si no encuentra el proyecto, y peta si no hay ninguno.
+- [x] **Los servidores no se liberan.** `createProject` resta un servidor, pero nada lo devuelve al completar el proyecto. Hay que liberarlo en `advanceMonth` cuando `completedNow`.
+- [x] `createProject` (`App.jsx:271`) no comprueba el dinero ni los servidores; solo lo hace el botón. La validación debe estar dentro de la acción.
+- [x] **El equipo queda congelado al crear el proyecto.** Se asignan `staff.slice(0, 3)` y `ownedAi.slice(0, 2)`, y no se pueden cambiar después. Hay que poder asignar y quitar empleados e IA en cada proyecto.
+- [x] Un mismo empleado puede estar en varios proyectos a la vez y rinde al 100 % en todos. Hay que repartir su dedicación o limitarle a un proyecto.
+- [x] La fecha límite está fija (`'Dic 2025'`). Debe calcularse a partir de la fecha del juego y la velocidad estimada.
+- [x] La calidad inicial es fija (48) y no depende del género, el estilo ni las tecnologías.
+- [x] Las tecnologías no afectan a nada salvo a la recompensa, y el botón "+" solo añade "Multijugador" (ver fase 2).
+- [x] El proyecto "idea" `p3` (Cyber Streets) no se puede iniciar. Al pulsarlo va a la pantalla de crear, pero con los valores por defecto, no con los suyos.
+- [ ] El icono del proyecto se elige solo por género y cae en `terminal` para Aventura y Estrategia. Hacen falta iconos por género. _(v0.2: el icono se elige por género entre las 3 ilustraciones que hay; faltan ilustraciones nuevas)._
+- [x] `ProjectDetail` usa `game.projects[0]` si no encuentra el proyecto, y peta si no hay ninguno.
 
 ### Personal
 
-- [ ] **Límite de 4 desarrolladores no aplicado.** La oficina muestra `staff.length/4`, pero se puede contratar a los 5 candidatos. Hay que aplicar la capacidad según el nivel de oficina.
-- [ ] No se puede despedir a nadie.
-- [ ] Solo hay 5 candidatos fijos. Hace falta un pool que se regenere.
-- [ ] `avatarIndex.devE` reutiliza el retrato de `devA`, y en `aiToolIndex` hay sprites repetidos (Copilot = ChatGPT, Unity = Claude). Faltan retratos e iconos.
+- [x] **Límite de 4 desarrolladores no aplicado.** La oficina muestra `staff.length/4`, pero se puede contratar a los 5 candidatos. Hay que aplicar la capacidad según el nivel de oficina.
+- [x] No se puede despedir a nadie.
+- [x] Solo hay 5 candidatos fijos. Hace falta un pool que se regenere.
+- [ ] `avatarIndex.devE` reutiliza el retrato de `devA`, y en `aiToolIndex` hay sprites repetidos (Copilot = ChatGPT, Unity = Claude). Faltan retratos e iconos. _(Pendiente: requiere arte nuevo)._
 
 ### Tiempo y progresión
 
-- [ ] Solo se puede subir **un nivel por mes**: la XP se queda en 100 con `clamp`, y el sobrante se pierde.
-- [ ] La XP no depende de lo que haces. Suma un +6 fijo más un bonus por **todos** los proyectos completados de la historia, cada mes, así que se acumula sin límite.
-- [ ] Los mensajes siempre dicen "Hoy". Hay que guardar la fecha del juego y mostrarla relativa.
+- [x] Solo se puede subir **un nivel por mes**: la XP se queda en 100 con `clamp`, y el sobrante se pierde.
+- [x] La XP no depende de lo que haces. Suma un +6 fijo más un bonus por **todos** los proyectos completados de la historia, cada mes, así que se acumula sin límite.
+- [x] Los mensajes siempre dicen "Hoy". Hay que guardar la fecha del juego y mostrarla relativa.
 
 ### Bugs de React
 
-- [ ] Varios botones leen `game` del cierre en lugar del estado actual. Por ejemplo, "Mejorar" en la oficina (`App.jsx:368`): si el tick mensual llega entre el render y el clic, se pierden cambios. Todas las acciones deben usar el updater (`setGame(current => …)`) o el reducer.
-- [ ] `JSON.parse` del guardado sin `try/catch` (`App.jsx:225`): un guardado corrupto rompe el juego en blanco (ver fase 4).
-- [ ] Se escribe en `localStorage` en cada cambio de estado, incluido el cambio de pestaña. Hay que limitar la frecuencia (debounce) o guardar en cada tick o acción.
-- [ ] No hay límite de error (error boundary): cualquier excepción deja la pantalla en blanco.
+- [x] Varios botones leen `game` del cierre en lugar del estado actual. Por ejemplo, "Mejorar" en la oficina (`App.jsx:368`): si el tick mensual llega entre el render y el clic, se pierden cambios. Todas las acciones deben usar el updater (`setGame(current => …)`) o el reducer.
+- [x] `JSON.parse` del guardado sin `try/catch` (`App.jsx:225`): un guardado corrupto rompe el juego en blanco (ver fase 4).
+- [x] Se escribe en `localStorage` en cada cambio de estado, incluido el cambio de pestaña. Hay que limitar la frecuencia (debounce) o guardar en cada tick o acción.
+- [x] No hay límite de error (error boundary): cualquier excepción deja la pantalla en blanco.
 
 ---
 
@@ -94,109 +96,112 @@ Estado de partida: **v0.1.0**, un único commit. La interfaz está muy trabajada
 
 Inventario completo de los elementos pulsables que hay en `App.jsx`.
 
+> **v0.2.0:** todas las filas de estas tablas están resueltas. Las excepciones son Expansión, Eventos y Managers, que ahora llevan la etiqueta "Próximamente" hasta la fase 3, y las decisiones dentro de los mensajes (también fase 3). Las gemas se muestran, pero todavía no sirven para nada (fase 3).
+
 **Leyenda:**
+
 - ✅ Funciona.
 - ⚠️ Funciona, pero con errores.
 - ❌ No hace nada o es falso.
 
 ### Pantalla de inicio (`StartScreen`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| ⚙ (engranaje) | ❌ | No tiene `onClick` | Abrir el menú de opciones |
-| Nueva partida | ⚠️ | Borra el guardado sin avisar | Pedir confirmación si hay una partida guardada |
-| Cargar partida | ⚠️ | Siempre está activo, aunque no haya guardado; en ese caso arranca una partida nueva | Desactivarlo si no hay guardado y mostrar la fecha y el nivel de la partida |
-| Opciones | ❌ | No tiene `onClick` | Pantalla de opciones: volumen, velocidad por defecto, idioma, borrar partida, exportar e importar, créditos |
-| (falta) | — | No se puede volver al menú desde la partida | Añadir menú de pausa o "Salir al menú" |
+| Botón          | Estado | Problema                                                                            | Qué hacer                                                                                                   |
+| -------------- | ------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| ⚙ (engranaje)  | ❌     | No tiene `onClick`                                                                  | Abrir el menú de opciones                                                                                   |
+| Nueva partida  | ⚠️     | Borra el guardado sin avisar                                                        | Pedir confirmación si hay una partida guardada                                                              |
+| Cargar partida | ⚠️     | Siempre está activo, aunque no haya guardado; en ese caso arranca una partida nueva | Desactivarlo si no hay guardado y mostrar la fecha y el nivel de la partida                                 |
+| Opciones       | ❌     | No tiene `onClick`                                                                  | Pantalla de opciones: volumen, velocidad por defecto, idioma, borrar partida, exportar e importar, créditos |
+| (falta)        | —      | No se puede volver al menú desde la partida                                         | Añadir menú de pausa o "Salir al menú"                                                                      |
 
 ### Barra superior (`TopBar`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| "+" junto a las gemas | ❌ | **Regala 25 gemas gratis en cada clic** | Quitarlo, o convertirlo en tienda de gemas o recompensa diaria |
-| Pausa / ▶ | ✅ | — | Añadir atajo de teclado (espacio) y `aria-label` |
-| 1x / 2x / 4x | ✅ | — | Añadir `aria-label` |
-| Pastillas de nivel, dinero e ingresos | — | Solo informan | Mostrar el detalle al pulsarlas (desglose del mes) |
+| Botón                                 | Estado | Problema                                | Qué hacer                                                      |
+| ------------------------------------- | ------ | --------------------------------------- | -------------------------------------------------------------- |
+| "+" junto a las gemas                 | ❌     | **Regala 25 gemas gratis en cada clic** | Quitarlo, o convertirlo en tienda de gemas o recompensa diaria |
+| Pausa / ▶                             | ✅     | —                                       | Añadir atajo de teclado (espacio) y `aria-label`               |
+| 1x / 2x / 4x                          | ✅     | —                                       | Añadir `aria-label`                                            |
+| Pastillas de nivel, dinero e ingresos | —      | Solo informan                           | Mostrar el detalle al pulsarlas (desglose del mes)             |
 
 ### Oficina (`Office`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| Mejorar $5.000 | ⚠️ | No se desactiva sin dinero; usa estado viejo; el precio no escala; no tiene nivel máximo | Coste creciente, botón desactivado y feedback |
-| Crear proyecto | ✅ | — | — |
-| Marketing | ✅ | Lleva a la pestaña "Tienda" | Unificar el nombre (ver Tienda) |
-| Huecos "+" del equipo | ✅ | Muestra 4 huecos fijos | Mostrar la capacidad real según la oficina |
+| Botón                 | Estado | Problema                                                                                 | Qué hacer                                     |
+| --------------------- | ------ | ---------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Mejorar $5.000        | ⚠️     | No se desactiva sin dinero; usa estado viejo; el precio no escala; no tiene nivel máximo | Coste creciente, botón desactivado y feedback |
+| Crear proyecto        | ✅     | —                                                                                        | —                                             |
+| Marketing             | ✅     | Lleva a la pestaña "Tienda"                                                              | Unificar el nombre (ver Tienda)               |
+| Huecos "+" del equipo | ✅     | Muestra 4 huecos fijos                                                                   | Mostrar la capacidad real según la oficina    |
 
 ### Proyectos (`Projects`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| + Nuevo Proyecto | ✅ | — | — |
-| Pestaña "En desarrollo" | ❌ | Es un `<span>` y se muestran todos los proyectos | Filtros reales |
-| Pestaña "Completados" | ❌ | Es un `<span>` | Filtrar los completados |
-| Pestaña "Cancelados" | ❌ | No existe la cancelación | Implementar cancelar proyecto o quitar la pestaña |
-| Tarjeta de proyecto | ⚠️ | Una idea abre la pantalla de crear sin sus datos | Precargar la plantilla |
+| Botón                   | Estado | Problema                                         | Qué hacer                                         |
+| ----------------------- | ------ | ------------------------------------------------ | ------------------------------------------------- |
+| + Nuevo Proyecto        | ✅     | —                                                | —                                                 |
+| Pestaña "En desarrollo" | ❌     | Es un `<span>` y se muestran todos los proyectos | Filtros reales                                    |
+| Pestaña "Completados"   | ❌     | Es un `<span>`                                   | Filtrar los completados                           |
+| Pestaña "Cancelados"    | ❌     | No existe la cancelación                         | Implementar cancelar proyecto o quitar la pestaña |
+| Tarjeta de proyecto     | ⚠️     | Una idea abre la pantalla de crear sin sus datos | Precargar la plantilla                            |
 
 ### Crear proyecto (`CreateProject`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| ‹ Volver | ✅ | — | — |
-| Selectores de género, estilo y tamaño | ✅ | Solo cambian el coste y la dificultad | Que el género y el estilo influyan en la calidad y la demanda |
-| "+" de tecnologías | ⚠️ | Solo añade "Multijugador"; no se puede quitar ninguna | Selector real de tecnologías con coste y efecto |
-| Chips de tecnologías | ❌ | No son interactivos | Permitir quitarlas |
-| Crear proyecto | ⚠️ | El mensaje de error es genérico | Decir qué falta (dinero, servidor o nombre) |
+| Botón                                 | Estado | Problema                                              | Qué hacer                                                     |
+| ------------------------------------- | ------ | ----------------------------------------------------- | ------------------------------------------------------------- |
+| ‹ Volver                              | ✅     | —                                                     | —                                                             |
+| Selectores de género, estilo y tamaño | ✅     | Solo cambian el coste y la dificultad                 | Que el género y el estilo influyan en la calidad y la demanda |
+| "+" de tecnologías                    | ⚠️     | Solo añade "Multijugador"; no se puede quitar ninguna | Selector real de tecnologías con coste y efecto               |
+| Chips de tecnologías                  | ❌     | No son interactivos                                   | Permitir quitarlas                                            |
+| Crear proyecto                        | ⚠️     | El mensaje de error es genérico                       | Decir qué falta (dinero, servidor o nombre)                   |
 
 ### Detalle de proyecto (`ProjectDetail`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| ‹ Volver | ✅ | — | — |
-| Pestañas Resumen, Tareas, Equipo y Análisis | ❌ | Son `<span>` | Implementar las 4 vistas o dejar solo Resumen |
-| Huecos "+" del equipo | ❌ | Son `<span>` | Asignar empleados al proyecto |
-| Continuar desarrollo | ⚠️ | Solo quita la pausa y **pone la velocidad a 4x** | Quitar la pausa sin cambiar la velocidad, o eliminar el botón |
-| (falta) | — | No se puede cancelar, lanzar antes ni hacer crunch | Añadir acciones de proyecto |
+| Botón                                       | Estado | Problema                                           | Qué hacer                                                     |
+| ------------------------------------------- | ------ | -------------------------------------------------- | ------------------------------------------------------------- |
+| ‹ Volver                                    | ✅     | —                                                  | —                                                             |
+| Pestañas Resumen, Tareas, Equipo y Análisis | ❌     | Son `<span>`                                       | Implementar las 4 vistas o dejar solo Resumen                 |
+| Huecos "+" del equipo                       | ❌     | Son `<span>`                                       | Asignar empleados al proyecto                                 |
+| Continuar desarrollo                        | ⚠️     | Solo quita la pausa y **pone la velocidad a 4x**   | Quitar la pausa sin cambiar la velocidad, o eliminar el botón |
+| (falta)                                     | —      | No se puede cancelar, lanzar antes ni hacer crunch | Añadir acciones de proyecto                                   |
 
 ### IA (`AiScreen`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| Comprar herramienta | ⚠️ | El precio mostrado no es el cobrado; no avisa si no hay dinero | Precio real, botón desactivado y confirmación |
-| "Activo" | ⚠️ | No se puede cancelar la suscripción | Permitir darla de baja |
-| Pastilla de gemas | — | Las gemas no sirven para nada | Ver fase 3 |
+| Botón               | Estado | Problema                                                       | Qué hacer                                     |
+| ------------------- | ------ | -------------------------------------------------------------- | --------------------------------------------- |
+| Comprar herramienta | ⚠️     | El precio mostrado no es el cobrado; no avisa si no hay dinero | Precio real, botón desactivado y confirmación |
+| "Activo"            | ⚠️     | No se puede cancelar la suscripción                            | Permitir darla de baja                        |
+| Pastilla de gemas   | —      | Las gemas no sirven para nada                                  | Ver fase 3                                    |
 
 ### Empleados (`Employees`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| + Contratar | ❌ | No tiene `onAction` | Abrir el pool de candidatos o quitarlo |
-| Salario / Contratar | ⚠️ | Cobro doble; sin límite de plazas; sin aviso por falta de dinero | Ver fase 1 |
-| "En equipo" | ⚠️ | No hace nada | Mostrar la ficha y permitir despedir |
+| Botón               | Estado | Problema                                                         | Qué hacer                              |
+| ------------------- | ------ | ---------------------------------------------------------------- | -------------------------------------- |
+| + Contratar         | ❌     | No tiene `onAction`                                              | Abrir el pool de candidatos o quitarlo |
+| Salario / Contratar | ⚠️     | Cobro doble; sin límite de plazas; sin aviso por falta de dinero | Ver fase 1                             |
+| "En equipo"         | ⚠️     | No hace nada                                                     | Mostrar la ficha y permitir despedir   |
 
 ### Tienda / Marketing (`Store`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| Pestaña "Tienda" | ⚠️ | Abre una pantalla titulada "Marketing" | Renombrar la pestaña a "Marketing" o crear una tienda real |
-| Botón de precio de la campaña | ⚠️ | Efecto instantáneo; se puede pulsar sin límite; sin feedback | Campañas con duración, tiempo de espera y rendimiento decreciente |
-| Título "Campañas activas" | ❌ | Lista el catálogo, no campañas activas | Separar catálogo y campañas en curso |
-| Gráfica | ❌ | Barras pseudoaleatorias | Historial real de fans e ingresos |
-| Expansión, Eventos y Managers | ❌ | Imágenes decorativas | Ver fase 3 |
-| Mensajes | ❌ | No se pueden abrir | Bandeja con detalle y decisiones (aceptar o rechazar ofertas) |
+| Botón                         | Estado | Problema                                                     | Qué hacer                                                         |
+| ----------------------------- | ------ | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Pestaña "Tienda"              | ⚠️     | Abre una pantalla titulada "Marketing"                       | Renombrar la pestaña a "Marketing" o crear una tienda real        |
+| Botón de precio de la campaña | ⚠️     | Efecto instantáneo; se puede pulsar sin límite; sin feedback | Campañas con duración, tiempo de espera y rendimiento decreciente |
+| Título "Campañas activas"     | ❌     | Lista el catálogo, no campañas activas                       | Separar catálogo y campañas en curso                              |
+| Gráfica                       | ❌     | Barras pseudoaleatorias                                      | Historial real de fans e ingresos                                 |
+| Expansión, Eventos y Managers | ❌     | Imágenes decorativas                                         | Ver fase 3                                                        |
+| Mensajes                      | ❌     | No se pueden abrir                                           | Bandeja con detalle y decisiones (aceptar o rechazar ofertas)     |
 
 ### Navegación inferior (`BottomNav`)
 
-| Botón | Estado | Problema | Qué hacer |
-|---|---|---|---|
-| Oficina, Proyectos, IA, Empleados, Tienda | ✅ | Los iconos son caracteres Unicode que cambian según el sistema | Iconos SVG propios |
+| Botón                                     | Estado | Problema                                                       | Qué hacer          |
+| ----------------------------------------- | ------ | -------------------------------------------------------------- | ------------------ |
+| Oficina, Proyectos, IA, Empleados, Tienda | ✅     | Los iconos son caracteres Unicode que cambian según el sistema | Iconos SVG propios |
 
 ### Transversal a todos los botones
 
-- [ ] Todos los botones sin acción deben desactivarse (`disabled`) cuando la acción no sea posible.
-- [ ] Añadir `aria-label` a los botones que solo tienen un icono (⚙, +, ‹, ▶, Ⅱ).
-- [ ] Añadir `type="button"` en todos los botones.
-- [ ] Dar feedback a cada acción: toast, animación o sonido.
-- [ ] Pedir confirmación en las acciones caras o destructivas.
+- [x] Todos los botones sin acción deben desactivarse (`disabled`) cuando la acción no sea posible.
+- [x] Añadir `aria-label` a los botones que solo tienen un icono (⚙, +, ‹, ▶, Ⅱ).
+- [x] Añadir `type="button"` en todos los botones.
+- [x] Dar feedback a cada acción: toast, animación o sonido.
+- [x] Pedir confirmación en las acciones caras o destructivas.
 
 ---
 
@@ -211,18 +216,18 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 - [ ] **Objetivo y final:** condición de victoria (llegar a "Imperio tecnológico" o a una valoración X) y derrota (bancarrota).
 - [ ] **Tutorial / onboarding** de las primeras partidas: qué hacer, cómo se gana y cómo se pierde.
 - [ ] **Estado inicial coherente:** hoy la partida empieza en nivel 3, con $15.430, 8.920 fans y proyectos ya al 65 %. Hay que decidir si se empieza desde cero ("Coder de habitación") como cuenta la narrativa.
-- [ ] **Cancelar proyecto**, con recuperación parcial del gasto.
-- [ ] **Estadísticas e historial:** ingresos por mes y ventas por proyecto.
+- [x] **Cancelar proyecto**, con recuperación parcial del gasto.
+- [ ] **Estadísticas e historial:** ingresos por mes y ventas por proyecto. _(v0.2: gráfica de seguidores y análisis por proyecto; falta el historial de ingresos)._
 - [ ] Opcional: sonido y música con controles de volumen.
 
 ---
 
 ## Fase 4 — Guardado robusto
 
-- [ ] Envolver lectura y escritura de `localStorage` en `try/catch`: en modo privado o con almacenamiento lleno ahora mismo falla.
-- [ ] Validar el guardado al cargarlo. Si está corrupto, avisar y ofrecer una partida nueva en vez de dejar la pantalla en blanco.
-- [ ] Añadir un número de versión dentro del guardado (`saveVersion`) y funciones de migración. Hoy cualquier cambio en el estado rompe las partidas existentes.
-- [ ] No guardar el estado de la interfaz (`activeTab`, `paused`) como si fuera parte de la partida.
+- [x] Envolver lectura y escritura de `localStorage` en `try/catch`: en modo privado o con almacenamiento lleno ahora mismo falla.
+- [x] Validar el guardado al cargarlo. Si está corrupto, avisar y ofrecer una partida nueva en vez de dejar la pantalla en blanco.
+- [ ] Añadir un número de versión dentro del guardado (`saveVersion`) y funciones de migración. Hoy cualquier cambio en el estado rompe las partidas existentes. _(v0.2: hay `saveVersion` y validación; faltan las migraciones)._
+- [x] No guardar el estado de la interfaz (`activeTab`, `paused`) como si fuera parte de la partida.
 - [ ] Exportar e importar la partida como archivo o código.
 - [ ] Opcional: varias ranuras de guardado y guardado en la nube (requiere backend y cuentas).
 - [ ] Opcional: progreso mientras el juego está cerrado, calculando los meses transcurridos.
@@ -262,7 +267,7 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
 ## Fase 7 — Legal y marcas
 
 - [ ] **Nombres de productos reales:** ChatGPT, Claude, Midjourney, Runway, GitHub Copilot y Unity son marcas registradas, y se usan con sus precios. Sustituirlos por parodias o nombres ficticios, o conseguir permiso.
-- [ ] **Personajes con nombres protegidos:** "Diana Prince" es Wonder Woman (DC Comics). Cambiarlo.
+- [x] **Personajes con nombres protegidos:** "Diana Prince" es Wonder Woman (DC Comics). Cambiarlo. _(v0.2: renombrada a Diana Prieto)._
 - [ ] Revisar el origen y la licencia de todas las imágenes de `public/assets`. Si son generadas por IA, revisar los términos de la herramienta usada.
 - [ ] Añadir un archivo `LICENSE` y una pantalla de créditos.
 - [ ] Política de privacidad y aviso de cookies si se añaden analíticas (RGPD).
