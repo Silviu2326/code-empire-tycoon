@@ -322,9 +322,9 @@ Inventario completo de los elementos pulsables que hay en `App.jsx`.
   - Falta el tipo `.webp` / `.avif` en `types`.
   - Faltan cabeceras de seguridad: `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`.
 - [ ] Dominio y HTTPS. _(Pendiente del titular: comprar el dominio y conectarlo en Cloudflare Pages (el HTTPS es automático))._
-- [x] Pipeline de despliegue: _(v0.5: CI con lint, tests, build y e2e en 3 navegadores; las previews por PR y el despliegue de `main` los hace Cloudflare Pages al conectar el repo)._
+- [x] Pipeline de despliegue: _(v0.5: CI con lint, tests, build y e2e en 3 navegadores; las previews por PR y el despliegue de `master` los hace Cloudflare Pages al conectar el repo)._
   - Cada PR genera un despliegue de preview.
-  - `main` despliega a producción.
+  - `master` despliega a producción.
 - [x] Monitorización de errores (Sentry o similar). _(v0.5: `src/telemetry.js` envía errores si se configura `VITE_ERROR_ENDPOINT`; se puede cambiar por Sentry)._
 - [x] Analíticas anónimas respetuosas con la privacidad: embudo del tutorial, duración de las partidas, dónde abandona la gente. _(v0.5: eventos del embudo si se configura `VITE_ANALYTICS_ENDPOINT`; sin cookies, respeta «No rastrear» y se puede desactivar en Opciones)._
 - [ ] Opcional: PWA (instalable y jugable sin conexión) con `vite-plugin-pwa`. _(Opcional, no hecho: el manifest ya existe; falta el service worker)._

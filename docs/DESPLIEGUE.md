@@ -8,11 +8,11 @@ Es gratis, con HTTPS y CDN incluidos. Crea un despliegue de preview en cada PR s
 
 1. En Cloudflare → **Workers & Pages → Create → Pages → Connect to Git**, elige `silviu2326/code-empire-tycoon`.
 2. Configuración de build:
-   - **Production branch:** `main`
+   - **Production branch:** `master`
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
    - **Variables de entorno:** `NODE_VERSION = 22`
-3. Guardar. Cada push a `main` publica en producción y cada PR recibe su propia URL de preview.
+3. Guardar. Cada push a `master` publica en producción y cada PR recibe su propia URL de preview.
 4. **Dominio:** en _Custom domains_, añade tu dominio. Cloudflare crea el certificado HTTPS automáticamente.
 5. Cuando tengas dominio, cambia en `index.html` la etiqueta `og:image` por la URL absoluta: `https://tu-dominio/icon-512.png`.
 
