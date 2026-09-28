@@ -53,6 +53,9 @@ function baseReducer(state, action) {
     case 'SET_PAUSED':
       return state.gameOver ? state : { ...state, paused: action.paused };
 
+    case 'SET_AUTOPAUSE':
+      return { ...state, autoPause: action.enabled };
+
     case 'CYCLE_SPEED':
       return { ...state, speed: SPEEDS[(SPEEDS.indexOf(state.speed) + 1) % SPEEDS.length] };
 

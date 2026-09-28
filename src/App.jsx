@@ -7,6 +7,7 @@ import { ConfirmDialog, Toast } from './components/ui.jsx';
 import { formatDate } from './game/format.js';
 import { createInitialGame } from './game/initialState.js';
 import { gameReducer } from './game/reducer.js';
+import { useGameClock } from './hooks/useGameClock.js';
 import { clearSave, loadSave, writeSave } from './game/save.js';
 import { Office } from './screens/Office.jsx';
 import { gameEvents, track } from './telemetry.js';
@@ -26,7 +27,6 @@ const Employees = lazyScreen(() => import('./screens/Employees.jsx'), 'Employees
 const Marketing = lazyScreen(() => import('./screens/Marketing.jsx'), 'Marketing');
 const Empire = lazyScreen(() => import('./screens/Empire.jsx'), 'Empire');
 
-const MONTH_MS = 4200;
 const TOAST_MS = 3000;
 const screens = {
   office: Office,
@@ -38,14 +38,6 @@ const screens = {
   employees: Employees,
   marketing: Marketing
 };
-
-function useGameLoop(game, dispatch, running) {
-  useEffect(() => {
-    if (!running || game.paused || game.gameOver) return undefined;
-    const timer = window.setInterval(() => dispatch({ type: 'TICK' }), MONTH_MS / game.speed);
-    return () => window.clearInterval(timer);
-  }, [running, game.paused, game.gameOver, game.speed, dispatch]);
-}
 
 function App() {
   const [save, setSave] = useState(loadSave);
@@ -59,16 +51,35 @@ function App() {
   const showIntro = playing && !game.introSeen;
   const showVictory = playing && game.won && !game.victorySeen;
   const menuOpen = playing && (modal !== null || confirm !== null || showIntro || showVictory);
-  useGameLoop(game, dispatch, playing && !menuOpen);
+  const tick = useCallback(() => dispatch({ type: 'TICK' }), []);
+  const monthBarRef = useGameClock({
+    running: playing && !menuOpen && !game.paused && !game.gameOver,
+    speed: game.speed,
+    onTick: tick
+  });
 
-  // Guardado automático, agrupando cambios seguidos.
+  // Guardado automático, agrupando cambios seguidos. Al ocultar o cerrar la pestaña se guarda al momento.
+  const latestGame = useRef(game);
   useEffect(() => {
+    latestGame.current = game;
     if (!playing) return undefined;
     const timer = window.setTimeout(() => {
       if (writeSave(game)) setSave({ game, status: 'ok' });
     }, 400);
     return () => window.clearTimeout(timer);
   }, [game, playing]);
+
+  useEffect(() => {
+    if (!playing) return undefined;
+    const flush = () => writeSave(latestGame.current);
+    const onVisibility = () => document.visibilityState === 'hidden' && flush();
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', flush);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', flush);
+    };
+  }, [playing]);
 
   const toast = game.feedback && game.feedback.seq !== dismissedToast ? game.feedback : null;
   useEffect(() => {
@@ -185,6 +196,8 @@ function App() {
       exportable={playing ? game : save.game}
       onClearSave={requestClearSave}
       onImport={requestImport}
+      autoPause={game.autoPause !== false}
+      onAutoPause={playing ? (enabled) => dispatch({ type: 'SET_AUTOPAUSE', enabled }) : null}
       onClose={() => setModal(playing ? 'menu' : null)}
     />
   );
@@ -204,7 +217,7 @@ function App() {
     <GameContext.Provider value={context}>
       <main className="app-shell">
         <section className="phone-frame">
-          <TopBar onOpenMenu={() => setModal('menu')} onOpenEconomy={() => setModal('economy')} />
+          <TopBar monthBarRef={monthBarRef} onOpenMenu={() => setModal('menu')} onOpenEconomy={() => setModal('economy')} />
           <div className="screen-body">
             <Suspense fallback={<p className="hint">Cargando…</p>}>
               <Screen key={`${ui.tab}-${ui.projectId || ''}-${ui.ideaId || ''}`} />

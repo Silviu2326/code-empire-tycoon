@@ -200,3 +200,29 @@ test('todas las pantallas se abren sin errores y sus botones tienen nombre', asy
   }
   expect(errors).toEqual([]);
 });
+
+test('el reloj conserva el progreso del mes al cambiar de velocidad y al pausar', async ({ page }) => {
+  await newGame(page);
+  const progress = () => page.locator('.month-progress span').evaluate((bar) => new DOMMatrix(getComputedStyle(bar).transform).a);
+
+  await page.getByRole('button', { name: /Reanudar/ }).click();
+  await page.waitForTimeout(1500);
+  const beforeSpeed = await progress();
+  expect(beforeSpeed).toBeGreaterThan(0.2);
+
+  await page.getByRole('button', { name: /Velocidad 1x/ }).click();
+  expect(await progress()).toBeGreaterThanOrEqual(beforeSpeed);
+
+  await page.getByRole('button', { name: /Pausar/ }).click();
+  const paused = await progress();
+  await page.waitForTimeout(800);
+  expect(await progress()).toBeCloseTo(paused, 2);
+  await expect(page.getByText('May 2025')).toBeVisible();
+});
+
+test('el panel Por hacer guía al jugador y lleva a la pantalla correcta', async ({ page }) => {
+  await newGame(page);
+  await expect(page.getByLabel(/tareas pendientes/)).toBeVisible();
+  await page.getByRole('button', { name: /desarrolla tu idea «Code Quest»/ }).click();
+  await expect(page.getByRole('heading', { name: 'Desarrollar idea' })).toBeVisible();
+});

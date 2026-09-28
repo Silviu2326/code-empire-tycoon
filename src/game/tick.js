@@ -32,6 +32,7 @@ export function advanceMonth(game) {
   let fans = game.fans;
   let launchIncome = 0;
   let xpGain = 2;
+  const launchedNames = [];
 
   // 1. Proyectos: los completados venden cada vez menos; los que están en desarrollo avanzan.
   const projects = game.projects.map((project) => {
@@ -54,6 +55,7 @@ export function advanceMonth(game) {
     wishlist = Math.round(wishlist * 0.6);
     fans += Math.round(launch / 120);
     launchIncome += launch;
+    launchedNames.push(project.name);
     xpGain += 10 + quality / 5;
     say(
       'Lanzamiento',
@@ -185,5 +187,27 @@ export function advanceMonth(game) {
       }
     : advanced;
 
-  return applyGoals(withEvent);
+  // 6. Aviso visible de lo más importante del mes y pausa automática ante decisiones o números rojos.
+  const highlight = event
+    ? { text: `Decisión pendiente: ${event.title}. Revisa tus mensajes.`, tone: 'orange' }
+    : money < 0 && !gameOver
+      ? {
+          text: `Números rojos: ${BANKRUPTCY_MONTHS - debtMonths} ${BANKRUPTCY_MONTHS - debtMonths === 1 ? 'mes' : 'meses'} para la quiebra.`,
+          tone: 'red'
+        }
+      : launchedNames.length
+        ? { text: `¡${launchedNames.join(', ')} a la venta! +${currency(launchIncome)}`, tone: 'green' }
+        : level > game.level
+          ? {
+              text: `¡Nivel ${level}!${stageIndex(level) > stageIndex(game.level) ? ` Nueva etapa: ${empireStages[stageIndex(level)].title}.` : ''}`,
+              tone: 'green'
+            }
+          : null;
+  const autoPause = game.autoPause !== false && (Boolean(event) || (money < 0 && debtMonths === 1 && !gameOver));
+
+  return applyGoals({
+    ...withEvent,
+    paused: withEvent.paused || autoPause,
+    feedback: highlight ? { seq: `m${elapsed}`, ...highlight, paused: autoPause } : game.feedback
+  });
 }

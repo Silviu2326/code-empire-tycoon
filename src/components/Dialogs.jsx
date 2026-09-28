@@ -63,7 +63,7 @@ export function PauseMenu({ onResume, onOptions, onExit }) {
   );
 }
 
-export function OptionsDialog({ exportable, onClearSave, onImport, onClose }) {
+export function OptionsDialog({ exportable, onClearSave, onImport, onClose, autoPause, onAutoPause }) {
   const fileRef = useRef(null);
   const [importError, setImportError] = useState(null);
 
@@ -121,6 +121,15 @@ export function OptionsDialog({ exportable, onClearSave, onImport, onClose }) {
           Borrar partida guardada
         </button>
       </section>
+      {onAutoPause && (
+        <section className="options-section">
+          <h3>Ritmo</h3>
+          <label className="toggle">
+            <input type="checkbox" checked={autoPause} onChange={(event) => onAutoPause(event.target.checked)} />
+            Pausar automáticamente ante decisiones y números rojos
+          </label>
+        </section>
+      )}
       <section className="options-section">
         <h3>Controles</h3>
         <p className="hint">Espacio: pausar o reanudar. Tab: moverse entre botones. Esc: cerrar ventanas.</p>

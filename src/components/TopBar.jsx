@@ -1,9 +1,10 @@
 import { currency, formatDate, number } from '../game/format.js';
+import { pendingActions } from '../game/advice.js';
 import { computeEconomy } from '../game/rules.js';
 import { useGame } from './GameContext.js';
 import { Icon } from './Icons.jsx';
 
-export function TopBar({ onOpenMenu, onOpenEconomy }) {
+export function TopBar({ monthBarRef, onOpenMenu, onOpenEconomy }) {
   const { game, dispatch } = useGame();
   const { net } = computeEconomy(game);
   return (
@@ -20,7 +21,12 @@ export function TopBar({ onOpenMenu, onOpenEconomy }) {
       <button type="button" className="square" onClick={onOpenMenu} aria-label="Menú">
         <Icon name="menu" size={20} />
       </button>
-      <div className="calendar">{formatDate(game)}</div>
+      <div className="calendar">
+        {formatDate(game)}
+        <span className="month-progress" aria-hidden="true">
+          <span ref={monthBarRef} />
+        </span>
+      </div>
       <button
         type="button"
         className="square"
@@ -62,8 +68,9 @@ const navItems = [
 const tabGroup = { create: 'projects', project: 'projects', empire: 'office' };
 
 export function BottomNav() {
-  const { ui, navigate } = useGame();
+  const { game, ui, navigate } = useGame();
   const current = tabGroup[ui.tab] || ui.tab;
+  const pending = pendingActions(game).length;
   return (
     <nav className="bottom-nav" aria-label="Secciones">
       {navItems.map(([id, label]) => (
@@ -76,6 +83,11 @@ export function BottomNav() {
         >
           <span>
             <Icon name={id} />
+            {id === 'office' && pending > 0 && (
+              <b className="nav-badge" aria-label={`${pending} tareas pendientes`}>
+                {pending}
+              </b>
+            )}
           </span>
           {label}
         </button>

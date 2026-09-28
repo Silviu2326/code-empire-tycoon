@@ -3,6 +3,7 @@ import { PixelOffice } from '../components/Scenes.jsx';
 import { Avatar, Bar, Stat } from '../components/ui.jsx';
 import { empireStages } from '../data/catalog.js';
 import { currency } from '../game/format.js';
+import { pendingActions } from '../game/advice.js';
 import { goals } from '../game/goals.js';
 import {
   MAX_OFFICE_LEVEL,
@@ -46,6 +47,7 @@ export function Office() {
         <Stat label="Oficina" value={`Nivel ${game.officeLevel}`} icon="⌂" tone="green" />
         <Stat label="Neto/mes" value={currency(net)} icon="♜" tone={net < 0 ? 'negative' : 'green'} />
       </div>
+      <Todo />
       <Goals />
       <section className="panel">
         <div className="section-head">
@@ -89,6 +91,38 @@ export function Office() {
       </section>
       <StageSummary stage={stage} onOpen={() => navigate('empire')} />
     </div>
+  );
+}
+
+function Todo() {
+  const { game, navigate } = useGame();
+  const actions = pendingActions(game);
+  if (actions.length === 0) return null;
+  return (
+    <section className="panel">
+      <div className="section-head">
+        <h2>Por hacer</h2>
+        <span className="mini-tag">{actions.length}</span>
+      </div>
+      <div className="todo-list">
+        {actions.map((action) =>
+          action.tab ? (
+            <button type="button" key={action.id} onClick={() => navigate(action.tab, action.extra)}>
+              <span className={`dot tone ${action.tone}`} aria-hidden="true" />
+              <span>{action.text}</span>
+              <span className="arrow" aria-hidden="true">
+                ›
+              </span>
+            </button>
+          ) : (
+            <p key={action.id}>
+              <span className={`dot tone ${action.tone}`} aria-hidden="true" />
+              <span>{action.text}</span>
+            </p>
+          )
+        )}
+      </div>
+    </section>
   );
 }
 

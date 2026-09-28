@@ -281,6 +281,7 @@ export function Toast({ feedback }) {
   return (
     <div key={feedback.seq} className={`toast ${feedback.tone}`} role="status" aria-live="polite">
       {feedback.text}
+      {feedback.paused && <strong className="toast-paused"> · Juego en pausa</strong>}
     </div>
   );
 }
