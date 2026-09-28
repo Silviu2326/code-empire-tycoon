@@ -1,0 +1,10 @@
+Copyright (c) 2025-2026 silviu2326. Todos los derechos reservados.
+
+Este repositorio contiene el código fuente, las ilustraciones y los textos de
+Code Empire Tycoon. No se concede ninguna licencia para copiar, modificar,
+distribuir ni usar comercialmente ninguna parte del proyecto sin permiso
+escrito del titular.
+
+Las dependencias de terceros (React, React DOM y las herramientas de
+desarrollo) se distribuyen bajo sus propias licencias, incluidas en
+node_modules/ y resumidas en docs/LEGAL.md.
